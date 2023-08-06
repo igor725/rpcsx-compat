@@ -1,4 +1,5 @@
 const express = require('express');
+const jbodyparser = require('body-parser').json();
 const JValidator = require('jsonschema').Validator;
 const fs = require('fs');
 const app = express();
@@ -85,8 +86,25 @@ const updateDB = () => {
 	db.sort((a, b) => b.status - a.status);
 };
 
+const saveDB = (path) => {
+	fs.writeFileSync(path, JSON.stringify(db));
+};
+
 require('express-ws')(app);
 app.use('/', express.static('../frontend/'));
+
+app.put('/db', jbodyparser, (req, res) => {
+	res.setHeader('content-type', 'application/json');
+	console.log(req.body);
+	const result = jvalid.validate(req.body, {$ref: '/DBEntry'});
+	res.write(`{"success": ${result.valid}, "message": "`);
+	if (result.valid === true) {
+		res.write('Suggestion submitted, thank you!');
+		// TODO: Save it
+	} else
+		res.write(result.errors[0].toString().replace('\\', '\\\\').replace('"', '\\"'));
+	res.end('"}');
+});
 
 app.get('/db/:page', (req, res) => {
 	res.setHeader('content-type', 'application/json');
