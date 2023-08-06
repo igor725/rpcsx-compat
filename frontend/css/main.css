@@ -23,6 +23,28 @@ h2.compat-title {
 	width: 70%;
 }
 
+.compat-add-game {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	text-align: center;
+	color: #e4dfdf48;
+	font-size: xx-large;
+	border-radius: 5px;
+	transition: background-color 250ms;
+	user-select: none;
+	position: fixed !important;
+	width: 32px;
+	height: 32px;
+	right: 40px;
+	bottom: 40px;
+}
+
+.compat-add-game:hover {
+	cursor: pointer;
+	background-color: #2c64ca;
+}
+
 .compat-status {
 	width: 100%;
 }

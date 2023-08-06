@@ -1,6 +1,6 @@
 window.addEventListener('load', () => {
-	const $ = qs => document.querySelector(qs); // Why not?
-	const $$ = qs => document.querySelectorAll(qs);
+	window.$ = qs => document.querySelector(qs); // Why not?
+	window.$$ = qs => document.querySelectorAll(qs);
 
 	const dburl = '/db/';
 	const info = {
@@ -129,7 +129,7 @@ window.addEventListener('load', () => {
 					return;
 				}
 
-				alert(`Error returned by server: ${res.error}`);
+				alert(`Error returned by server: ${res.message}`);
 				return;
 			}
 
@@ -188,11 +188,11 @@ window.addEventListener('load', () => {
 
 	const htstitms = [];
 
-	htstitms.push(`<div class="item" data-value=""><span>All</span></div>`);
-	htstitms.push(`<div class="item" data-value="num"><span>0-9</span></div>`);
+	htstitms.push('<div class="item" data-value=""><span>All</span></div>');
+	htstitms.push('<div class="item" data-value="num"><span>0-9</span></div>');
 	for (let i = 65; i < 91; ++i)
 		htstitms.push(`<div class="item" data-value="${String.fromCharCode(i)}"><span>${String.fromCharCode(i)}</span></div>`);
-	htstitms.push(`<div class="item" data-value="sym"><span>#</span></div>`);
+	htstitms.push('<div class="item" data-value="sym"><span>#</span></div>');
 
 	$('div.compat-starts').innerHTML = htstitms.join('');
 
@@ -220,6 +220,12 @@ window.addEventListener('load', () => {
 	$('div.compat-pages').addEventListener('click', ev => {
 		if (ev.target.tagName !== 'A') return;
 		setHashParam('p', ev.target.innerText);
+	});
+
+	$('div.compat-add-game').addEventListener('click', ev => {
+		import('./eloader.js').then(async ed => {
+			await ed.start();
+		});
 	});
 
 	window.addEventListener('hashchange', updateTable);

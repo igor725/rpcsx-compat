@@ -76,6 +76,15 @@ const db = openDB('./db.json');
 const maxItemsPerPage = 20;
 const overall = [];
 
+const getGameByID = id => {
+	for (let i = 0; i < db.length; ++i) {
+		if (db[i].uid === id)
+			return db[i];
+	}
+
+	return null;
+};
+
 const updateDB = () => {
 	for (let i = 0; i < 5; ++i) overall[i] = 0;
 
@@ -91,6 +100,21 @@ const saveDB = (path) => {
 };
 
 app.use('/', express.static('../frontend/'));
+
+app.get('/game/:uid', (req, res) => {
+	res.setHeader('content-type', 'application/json');
+
+	const uid = parseInt(req.params.uid);
+	if (uid >= 0) {
+		const game = getGameByID(uid);
+		if (game !== null) {
+			res.send(JSON.stringify({success: true, game: game}));
+			return;
+		}
+	}
+
+	res.send('{"success": false, "message": "No game found"}');
+});
 
 app.put('/db', jbodyparser, (req, res) => {
 	res.setHeader('content-type', 'application/json');
@@ -164,7 +188,7 @@ app.get('/db/:page', (req, res) => {
 		return;
 	}
 
-	res.send('{"success": false, "error": "Page number must be a integer value that is greater than 0"}')
+	res.send('{"success": false, "message": "Page number must be a integer value that is greater than 0"}')
 });
 
 updateDB();
