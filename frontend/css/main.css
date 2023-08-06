@@ -138,9 +138,11 @@ span.game-title {
 
 .compat-serial {
 	display: inline-block;
+	pointer-events: all;
 }
 
 .compat-serial img {
+	cursor: pointer;
 	vertical-align: middle;
 	width: 23px !important;
 	height: 23px !important;

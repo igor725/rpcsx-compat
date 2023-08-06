@@ -65,7 +65,7 @@ window.addEventListener('load', () => {
 						const hids = [];
 
 						for (let j = 0; j < ids.length; j++) {
-							hids.push(`<div class="compat-serial">
+							hids.push(`<div class="compat-serial" data-id=${ids[j]}>
 								<img src="/static/${info.regions[regions[j]]}.png"/>
 								<a href="javascript:void(0);">${ids[j]}</a>
 							</div>`);
@@ -138,6 +138,16 @@ window.addEventListener('load', () => {
 	};
 
 	$('div.compat-table .compat-tbody').addEventListener('click', ev => {
+		const pnode = ev.target.parentNode;
+		if (pnode.classList.contains('compat-serial')) {
+			const a = document.createElement('a');
+			const code = pnode.dataset.id.match(/^([A-Z]+)([0-9]+)/);
+			a.href = `https://serialstation.com/titles/${code[1]}/${code[2]}`;
+			a.target = '_blank';
+			a.click();
+			a.remove();
+			return;
+		}
 		const target = ev.target.classList.contains('.compat-trow') ? ev.target : ev.target.closest('div.compat-trow');
 		if (target.classList.contains('game-extrainfo')) return;
 		const info = getNextRowAfter(target);
