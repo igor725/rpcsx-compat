@@ -93,6 +93,7 @@ const saveDB = (path) => {
 require('express-ws')(app);
 app.use('/', express.static('../frontend/'));
 
+
 app.put('/db', jbodyparser, (req, res) => {
 	res.setHeader('content-type', 'application/json');
 	console.log(req.body);
@@ -110,7 +111,8 @@ app.get('/db/:page', (req, res) => {
 	res.setHeader('content-type', 'application/json');
 
 	const pagen = parseInt(req.params.page);
-	const {filter, starts} = req.query;
+	const {filter, starts, bstat} = req.query;
+	const bstati = parseInt(bstat ?? 0xFFFFFFFF);
 
 	if (pagen > 0) {
 		const dbsize = db.length;
@@ -118,7 +120,7 @@ app.get('/db/:page', (req, res) => {
 		const end = Math.min(dbsize, start + maxItemsPerPage);
 
 		res.write(`{"success": true, "overall": [${overall.join(', ')}], `);
-		if ((filter == null || filter === '') && (starts == null || starts === '')) {
+		if ((filter == null || filter === '') && (starts == null || starts === '') && (bstati == null || bstati === 0)) {
 			res.write(`"pages": ${Math.ceil(dbsize / maxItemsPerPage)}, "items": [`);
 			for (let i = start; i < end; ++i) {
 				if (i > start) res.write(', ');
@@ -133,6 +135,7 @@ app.get('/db/:page', (req, res) => {
 			const items = [];
 
 			switch (starts) {
+				case undefined:
 				case '':
 					ustarts = null;
 					break;
@@ -149,7 +152,11 @@ app.get('/db/:page', (req, res) => {
 
 			for (let i = 0; i < db.length; ++i) {
 				const utitle = db[i].title.toUpperCase();
-				if ((ustarts ? ustarts.test(utitle) : true) && (ufilter ? utitle.indexOf(ufilter) !== -1 || db[i].ids.findIndex(id => id.indexOf(ufilter) !== -1) !== -1 : true)) {
+				if (
+					((bstati & (1 << db[i].status)) > 0) &&
+					(ustarts ? ustarts.test(utitle) : true) &&
+					(ufilter ? utitle.indexOf(ufilter) !== -1 || db[i].ids.findIndex(id => id.indexOf(ufilter) !== -1) !== -1 : true)
+				) {
 					if (found++ < start || items.length >= maxItemsPerPage) continue;
 					items.push(JSON.stringify(db[i]));
 				}

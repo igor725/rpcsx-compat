@@ -18,15 +18,28 @@ window.addEventListener('load', () => {
 		regions: ['USA', 'EUR', 'JPN']
 	};
 
+	const getHashParamInt = (param) => {
+		const params = new URLSearchParams(location.hash.substring(1));
+		return parseInt(params.get(param) ?? 0);
+	};
+
+	const setHashParam = (param, value) => {
+		const params = new URLSearchParams(location.hash.substring(1));
+		params.set(param, value);
+		location.hash = params.toString();
+	};
+
 	const updateTable = () => {
 		const params = new URLSearchParams(location.hash.substring(1));
 		const cpage = parseInt(params.get('p') ?? '1');
+		const ibstat = parseInt(params.get('b') ?? '0');
 		const filter = params.get('f');
 		const starts = params.get('s');
 		const query = [];
 
 		if (filter !== null) query.push(`filter=${encodeURIComponent(filter)}`);
 		if (starts !== null) query.push(`starts=${encodeURIComponent(starts)}`);
+		if (ibstat !== 0) query.push(`bstat=${ibstat}`);
 
 		const xhr = new XMLHttpRequest();
 		xhr.responseType = 'json';
@@ -41,7 +54,7 @@ window.addEventListener('load', () => {
 					const items = res.items;
 					const pages = res.pages;
 					if (pages > 0 && cpage > pages) {
-						updateHashParam('p', pages);
+						setHashParam('p', pages);
 						return;
 					}
 					const overall = res.overall;
@@ -50,7 +63,13 @@ window.addEventListener('load', () => {
 					const htoverall = [];
 
 					for (let i = overall.length - 1; i >= 0; --i) {
-						htoverall.push(`<div class="compat-status-line"><strong>${info.statuses[i]} (${((overall[i] / max) * 100).toFixed(2)}%)</strong>: ${info.expls[i]}</div>`);
+						htoverall.push(`
+							<div class="compat-status-line">
+								<input type="checkbox" value="${1 << i}"${(ibstat & (1 << i)) > 0 ? ' checked' : ''}/>
+								<strong style="color: ${info.colors[i]}">${info.statuses[i]} (${((overall[i] / max) * 100).toFixed(2)}%)</strong>:
+								${info.expls[i]}
+							</div>
+						`);
 					}
 
 					$('div.compat-status').innerHTML = htoverall.join('');
@@ -66,7 +85,7 @@ window.addEventListener('load', () => {
 
 						for (let j = 0; j < ids.length; j++) {
 							hids.push(`<div class="compat-serial" data-id=${ids[j]}>
-								<img src="/static/${info.regions[regions[j]]}.png"/>
+								<img src="/assets/${info.regions[regions[j]]}.png"/>
 								<a href="javascript:void(0);">${ids[j]}</a>
 							</div>`);
 						}
@@ -75,7 +94,7 @@ window.addEventListener('load', () => {
 							<div class="compat-trow${lr}" data-id="${item.uid}">
 								<div class="compat-tcell first">${hids.join('<br>')}</div>
 								<div class="compat-tcell">
-									<img class="compat-distr" src="/static/${info.distribs[item.distr]}.png"/>
+									<img class="compat-distr" src="/assets/${info.distribs[item.distr]}.png"/>
 									<span class="game-title">${item.title}</span>
 								</div>
 								<div class="compat-tcell" style="color: ${info.colors[item.status]}">${info.statuses[item.status]}</div>
@@ -177,28 +196,30 @@ window.addEventListener('load', () => {
 
 	$('div.compat-starts').innerHTML = htstitms.join('');
 
-	updateHashParam = (param, value) => {
-		const params = new URLSearchParams(location.hash.substring(1));
-		params.set(param, value);
-		location.hash = params.toString();
-	};
-
 	let inpupd = null;
 	$('div.compat-search input').addEventListener('input', ev => {
 		if (inpupd !== null) clearTimeout(inpupd);
 		inpupd = setTimeout(() => {
-			updateHashParam('f', ev.target.value);
+			setHashParam('f', ev.target.value);
 			inpupd = null;
 		}, 1000);
 	});
 
 	$('div.compat-starts').addEventListener('click', ev => {
-		updateHashParam('s', ev.target.dataset.value ?? '');
+		setHashParam('s', ev.target.dataset.value ?? '');
+	});
+
+	$('div.compat-status').addEventListener('click', ev => {
+		const target = ev.target;
+		if (target.tagName !== 'INPUT') return;
+		const curr = getHashParamInt('b');
+		const bit = parseInt(target.value);
+		setHashParam('b', target.checked ? curr | bit : curr & ~bit);
 	});
 
 	$('div.compat-pages').addEventListener('click', ev => {
 		if (ev.target.tagName !== 'A') return;
-		updateHashParam('p', ev.target.innerText);
+		setHashParam('p', ev.target.innerText);
 	});
 
 	window.addEventListener('hashchange', updateTable);
