@@ -75,12 +75,14 @@ const db = openDB('./db.json');
 const maxItemsPerPage = 20;
 const overall = [];
 
-const updateOverall = () => {
+const updateDB = () => {
 	for (let i = 0; i < 5; ++i) overall[i] = 0;
 
 	db.forEach(item => {
 		++overall[item.status];
 	});
+
+	db.sort((a, b) => b.status - a.status);
 };
 
 require('express-ws')(app);
@@ -143,5 +145,5 @@ app.get('/db/:page', (req, res) => {
 	res.send('{"success": false, "error": "Page number must be a integer value that is greater than 0"}')
 });
 
-updateOverall();
+updateDB();
 app.listen(8081, () => console.log(`Server started on http://127.0.0.1:8081/`));
