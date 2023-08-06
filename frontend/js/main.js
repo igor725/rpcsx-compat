@@ -72,7 +72,7 @@ window.addEventListener('load', () => {
 						}
 
 						ht_items.push(`
-							<div class="compat-trow${lr}">
+							<div class="compat-trow${lr}" data-id="${item.uid}">
 								<div class="compat-tcell first">${hids.join('<br>')}</div>
 								<div class="compat-tcell">
 									<img class="compat-distr" src="/static/${info.distribs[item.distr]}.png"/>

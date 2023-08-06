@@ -1,7 +1,77 @@
 const express = require('express');
+const JValidator = require('jsonschema').Validator;
 const fs = require('fs');
 const app = express();
-const db = fs.existsSync('./db.json') ? JSON.parse(fs.readFileSync('./db.json', {encoding: 'utf8', flag: 'r'})) : [];
+
+const jvalid = new JValidator();
+jvalid.addSchema({
+	type: 'object',
+	properties: {
+		uid: {
+			type: 'integer',
+			minimum: 0
+		},
+		ids: {
+			type: 'array',
+			items: {type: 'string'}
+		},
+		regions: {
+			type: 'array',
+			items: {type: 'number'}
+		},
+		title: {
+			type: 'string',
+			pattern: '^[A-Za-z0-9\.,\/#\!\$%\^&\*;:{}=\-_`~\(\)\"\' ]+$'
+		},
+		updated: {
+			type: 'integer',
+			minimum: 0
+		},
+		type: {
+			type: 'integer',
+			minimum: 0,
+			maximum: 2
+		},
+		distr: {
+			type: 'integer',
+			minimum: 0,
+			maximum: 1
+		},
+		status: {
+			type: 'integer',
+			minimum: 0,
+			maximum: 4
+		},
+		comment: {
+			type: 'string',
+			maxLength: 1024
+		},
+		rpcsx: {
+			type: 'string',
+			minLength: 7,
+			maxLength: 40,
+			pattern: '^[0-9A-Fa-f]+$'
+		},
+	}
+}, '/DBEntry');
+
+const dbschema = {
+	type: 'array',
+	items: {$ref: '/DBEntry'},
+	properties: {
+		uniqueItems: true
+	}
+};
+
+const openDB = path => {
+	if (!fs.existsSync(path)) return [];
+	const jdata = JSON.parse(fs.readFileSync(path, {encoding: 'utf8', flag: 'r'}));
+	const res = jvalid.validate(jdata, dbschema);
+	if (!res.valid) throw new Error(res.errors[0].toString());
+	return jdata;
+};
+
+const db = openDB('./db.json');
 const maxItemsPerPage = 20;
 const overall = [];
 
@@ -20,8 +90,7 @@ app.get('/db/:page', (req, res) => {
 	res.setHeader('content-type', 'application/json');
 
 	const pagen = parseInt(req.params.page);
-	const filter = req.query.filter;
-	const starts = req.query.starts;
+	const {filter, starts} = req.query;
 
 	if (pagen > 0) {
 		const dbsize = db.length;
@@ -48,7 +117,7 @@ app.get('/db/:page', (req, res) => {
 					ustarts = null;
 					break;
 				case 'sym':
-					ustarts = /^[\.\#]/;
+					ustarts = /^[\.,\/#\!\$%\^&\*;:{}=\-_`~()]/;
 					break;
 				case 'num':
 					ustarts = /^[0-9]/;
