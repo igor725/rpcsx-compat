@@ -90,9 +90,7 @@ const saveDB = (path) => {
 	fs.writeFileSync(path, JSON.stringify(db));
 };
 
-require('express-ws')(app);
 app.use('/', express.static('../frontend/'));
-
 
 app.put('/db', jbodyparser, (req, res) => {
 	res.setHeader('content-type', 'application/json');
@@ -126,7 +124,6 @@ app.get('/db/:page', (req, res) => {
 				if (i > start) res.write(', ');
 				res.write(JSON.stringify(db[i]));
 			}
-
 			res.end(']}');
 		} else {
 			let found = 0;
