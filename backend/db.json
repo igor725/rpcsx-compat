@@ -328,11 +328,23 @@
 		"ids": ["CUSA18061", "CUSA18038", "CUSA18135"],
 		"regions": [1, 0, 2],
 		"title": "The Last of Us Part II",
-		"updated": 1690923600000,
+		"updated": 1691355600000,
 		"type": 1,
 		"distr": 0,
 		"status": 0,
 		"comment": "",
 		"rpcsx": "8a5eb8e5"
+	},
+	{
+		"uid": 28,
+		"ids": ["CUSA09421"],
+		"regions": [1],
+		"title": "Sky Force Reloaded",
+		"updated": 1691355600000,
+		"type": 0,
+		"distr": 0,
+		"status": 1,
+		"comment": "",
+		"rpcsx": "6441b7b1"
 	}
 ]

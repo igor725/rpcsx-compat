@@ -1,3 +1,5 @@
+import {onload} from './editor.js';
+
 const genHTML = () => {
 	const xhr = new XMLHttpRequest();
 	xhr.onload = () => {
@@ -34,6 +36,7 @@ const genHTML = () => {
 		body.style.overflowY = 'hidden';
 		shadow.style.display = 'flex';
 		body.appendChild(shadow);
+		onload();
 	};
 	xhr.open('get', 'editor.html');
 	xhr.send();

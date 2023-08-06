@@ -156,8 +156,8 @@ window.addEventListener('load', () => {
 		setTimeout(() => info.classList.remove('close'), 255);
 	};
 
-	$('div.compat-table .compat-tbody').addEventListener('click', ev => {
-		const pnode = ev.target.parentNode;
+	$('div.compat-table .compat-tbody').addEventListener('click', ({target}) => {
+		const pnode = target.parentNode;
 		if (pnode.classList.contains('compat-serial')) {
 			const a = document.createElement('a');
 			const code = pnode.dataset.id.match(/^([A-Z]+)([0-9]+)/);
@@ -167,14 +167,14 @@ window.addEventListener('load', () => {
 			a.remove();
 			return;
 		}
-		const target = ev.target.classList.contains('.compat-trow') ? ev.target : ev.target.closest('div.compat-trow');
-		if (target.classList.contains('game-extrainfo')) return;
-		const info = getNextRowAfter(target);
+		const tnode = target.classList.contains('.compat-trow') ? target : target.closest('div.compat-trow');
+		if (tnode.classList.contains('game-extrainfo')) return;
+		const info = getNextRowAfter(tnode);
 		if (info === null) return;
 
-		if (target.classList.toggle('game-expanded')) {
+		if (tnode.classList.toggle('game-expanded')) {
 			$$('.compat-trow.game-expanded').forEach(elem => {
-				if (elem !== target) {
+				if (elem !== tnode) {
 					elem.classList.remove('game-expanded');
 					closeInfo(getNextRowAfter(elem));
 				}
@@ -205,21 +205,20 @@ window.addEventListener('load', () => {
 		}, 1000);
 	});
 
-	$('div.compat-starts').addEventListener('click', ev => {
-		setHashParam('s', ev.target.dataset.value ?? '');
+	$('div.compat-starts').addEventListener('click', ({target}) => {
+		setHashParam('s', target.dataset.value ?? '');
 	});
 
-	$('div.compat-status').addEventListener('click', ev => {
-		const target = ev.target;
+	$('div.compat-status').addEventListener('click', ({target}) => {
 		if (target.tagName !== 'INPUT') return;
 		const curr = getHashParamInt('b');
 		const bit = parseInt(target.value);
 		setHashParam('b', target.checked ? curr | bit : curr & ~bit);
 	});
 
-	$('div.compat-pages').addEventListener('click', ev => {
-		if (ev.target.tagName !== 'A') return;
-		setHashParam('p', ev.target.innerText);
+	$('div.compat-pages').addEventListener('click', ({target}) => {
+		if (target.tagName !== 'A') return;
+		setHashParam('p', target.innerText);
 	});
 
 	$('div.compat-add-game').addEventListener('click', ev => {

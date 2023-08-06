@@ -69,6 +69,40 @@
 	display: grid;
 	width: 100%;
 	height: 100%;
+	font-family: 'Roboto', sans-serif;
 	grid-template-columns: 1fr;
-	grid-template-rows: 1fr 50px;
+	grid-template-rows: 40px 1fr 50px;
+}
+
+.editor-title {
+	font-size: x-large;
+}
+
+.editor-title span {
+	color: #e8e8e8;
+}
+
+.editor-title input {
+	display: none;
+	border: none;
+	text-transform: uppercase;
+	padding: 0;
+	margin: 0;
+}
+
+.editor-title input::placeholder {
+	font-size: x-large;
+}
+
+.editor-center {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.editor-buttons input {
+	width: 20%;
+	height: 100%;
+	margin-right: 5px;
+	border-radius: 5px;
 }

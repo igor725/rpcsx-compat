@@ -14,11 +14,20 @@ jvalid.addSchema({
 		},
 		ids: {
 			type: 'array',
-			items: {type: 'string'}
+			items: {
+				type: 'string',
+				pattern: '^[A-Z]{4}[0-9]{5}$',
+				minLength: 9,
+				maxLength: 9
+			}
 		},
 		regions: {
 			type: 'array',
-			items: {type: 'number'}
+			items: {
+				type: 'number',
+				minimum: 0,
+				maximum: 2
+			}
 		},
 		title: {
 			type: 'string',
@@ -100,6 +109,22 @@ const saveDB = (path) => {
 };
 
 app.use('/', express.static('../frontend/'));
+
+app.get('/find/:code', (req, res) => {
+	res.setHeader('content-type', 'application/json');
+
+	const {code} = req.params;
+
+	for (let i = 0; i < db.length; ++i) {
+		const ids = db[i].ids;
+		if (ids.findIndex(id => id === code) !== -1) {
+			res.send(JSON.stringify({success: true, game: db[i]}));
+			return;
+		}
+	}
+
+	res.send('{"success": false, "message": "No game found"}');
+});
 
 app.get('/game/:uid', (req, res) => {
 	res.setHeader('content-type', 'application/json');
