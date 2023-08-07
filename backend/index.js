@@ -10,10 +10,12 @@ jvalid.addSchema({
 	properties: {
 		uid: {
 			type: 'integer',
-			minimum: 0
+			minimum: -1,
+			required: true
 		},
 		ids: {
 			type: 'array',
+			required: true,
 			items: {
 				type: 'string',
 				pattern: '^[A-Z]{4}[0-9]{5}$',
@@ -23,41 +25,50 @@ jvalid.addSchema({
 		},
 		regions: {
 			type: 'array',
+			required: true,
 			items: {
 				type: 'number',
 				minimum: 0,
-				maximum: 2
+				maximum: 3
 			}
 		},
 		title: {
 			type: 'string',
-			pattern: '^[A-Za-z0-9\.,\/#\!\$%\^&\*;:{}=\-_`~\(\)\"\' ]+$'
+			required: true,
+			pattern: '^[A-Za-z0-9\x20-\x3C\x3F\x40]+$'
 		},
 		updated: {
 			type: 'integer',
+			required: true,
 			minimum: 0
 		},
 		type: {
 			type: 'integer',
+			required: true,
 			minimum: 0,
 			maximum: 2
 		},
 		distr: {
 			type: 'integer',
+			required: true,
 			minimum: 0,
-			maximum: 1
+			maximum: 2
 		},
 		status: {
 			type: 'integer',
+			required: true,
 			minimum: 0,
 			maximum: 4
 		},
 		comment: {
 			type: 'string',
-			maxLength: 1024
+			required: true,
+			maxLength: 1024,
+			not: {id: '[detected HTML code]', pattern: '<[^>]*>'}
 		},
 		rpcsx: {
 			type: 'string',
+			required: true,
 			minLength: 7,
 			maxLength: 40,
 			pattern: '^[0-9A-Fa-f]+$'
@@ -84,8 +95,11 @@ const openDB = path => {
 const db = openDB('./db.json');
 const maxItemsPerPage = 20;
 const overall = [];
+let latestUID = -1;
 
 const getGameByID = id => {
+	if (id < 0) return null;
+
 	for (let i = 0; i < db.length; ++i) {
 		if (db[i].uid === id)
 			return db[i];
@@ -99,6 +113,7 @@ const updateDB = () => {
 
 	db.forEach(item => {
 		++overall[item.status];
+		latestUID = Math.max(latestUID, item.uid);
 	});
 
 	db.sort((a, b) => b.status - a.status);
@@ -141,17 +156,45 @@ app.get('/game/:uid', (req, res) => {
 	res.send('{"success": false, "message": "No game found"}');
 });
 
+const compareArrays = (a, b) =>
+	a.length === b.length &&
+	a.every((el, idx) => el === b[idx]);
+
+const isSomethingChanged = game => {
+	if (game.uid < 0) return true;
+	const ogame = getGameByID(game.uid);
+
+	return game.title !== ogame.title ||
+		   game.type !== ogame.type ||
+		   game.distr !== ogame.distr ||
+		   game.status !== ogame.status ||
+		   game.comment !== ogame.comment ||
+		   game.rpcsx !== ogame.rpcsx ||
+		   !compareArrays(game.regions, ogame.regions) ||
+		   !compareArrays(game.ids, ogame.ids);
+};
+
 app.put('/db', jbodyparser, (req, res) => {
 	res.setHeader('content-type', 'application/json');
-	console.log(req.body);
-	const result = jvalid.validate(req.body, {$ref: '/DBEntry'});
-	res.write(`{"success": ${result.valid}, "message": "`);
+	const game = req.body;
+	const result = jvalid.validate(game, {$ref: '/DBEntry'});
+	const resp = {success: true, message: ''};
+
 	if (result.valid === true) {
-		res.write('Suggestion submitted, thank you!');
-		// TODO: Save it
-	} else
-		res.write(result.errors[0].toString().replace('\\', '\\\\').replace('"', '\\"'));
-	res.end('"}');
+		if (!isSomethingChanged(game)) {
+			resp.success = false;
+			resp.message = 'Nothing changed! Your suggestion was rejected.';
+		} else {
+			// TODO: Save it
+			console.log(game);
+			resp.message = 'Suggestion submitted, thank you!';
+		}
+	} else {
+		resp.success = false;
+		resp.message = result.errors[0].toString();
+	}
+
+	res.send(JSON.stringify(resp));
 });
 
 app.get('/db/:page', (req, res) => {
@@ -186,7 +229,7 @@ app.get('/db/:page', (req, res) => {
 					ustarts = null;
 					break;
 				case 'sym':
-					ustarts = /^[\.,\/#\!\$%\^&\*;:{}=\-_`~()]/;
+					ustarts = /^[\x21-\x3C\x3F\x40]/;
 					break;
 				case 'num':
 					ustarts = /^[0-9]/;
@@ -213,7 +256,7 @@ app.get('/db/:page', (req, res) => {
 		return;
 	}
 
-	res.send('{"success": false, "message": "Page number must be a integer value that is greater than 0"}')
+	res.send('{"success": false, "message": "Page number must be a integer value that is greater than 0"}');
 });
 
 updateDB();

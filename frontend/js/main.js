@@ -1,8 +1,10 @@
-window.addEventListener('load', () => {
-	window.$ = qs => document.querySelector(qs); // Why not?
-	window.$$ = qs => document.querySelectorAll(qs);
+// Why not?
+window.on = window.addEventListener;
+window.$ = qs => document.querySelector(qs);
+window.$$ = qs => document.querySelectorAll(qs);
+Element.prototype.on = Element.prototype.addEventListener;
 
-	const dburl = '/db/';
+window.on('load', () => {
 	const info = {
 		statuses: ['Nothing', 'Loadable', 'Intro', 'Ingame', 'Playable'],
 		expls: [
@@ -12,10 +14,10 @@ window.addEventListener('load', () => {
 			'Games that either can\'t be finished, have serious glitches or have insufficient performance',
 			'Games that can be completed with playable performance and no game breaking glitches'
 		],
-		colors: ['#455556', '#e74c3c', '#e08a1e', '#f9b22f', '#1ebc61'],
+		colors: ['#e74c3c', '#fa6800', '#e08a1e', '#f9b22f', '#1ebc61'],
 		types: ['Multiplatform', 'PlayStation™ exclusive', 'Console exclusive'],
-		distribs: ['DIGIT', 'DISK'],
-		regions: ['USA', 'EUR', 'JPN']
+		distribs: ['DIGIT', 'DISK', 'HBREW'],
+		regions: ['WOR', 'USA', 'EUR', 'JPN']
 	};
 
 	const getHashParamInt = (param) => {
@@ -49,7 +51,7 @@ window.addEventListener('load', () => {
 		};
 		xhr.onload = () => {
 			const res = xhr.response;
-			if (typeof res === 'object' && !Array.isArray(res)) {
+			if (res !== null && typeof res === 'object' && !Array.isArray(res)) {
 				if (res.success === true) {
 					const items = res.items;
 					const pages = res.pages;
@@ -100,11 +102,12 @@ window.addEventListener('load', () => {
 								<div class="compat-tcell" style="color: ${info.colors[item.status]}">${info.statuses[item.status]}</div>
 								<div class="compat-tcell">${(new Date(item.updated).toLocaleDateString())}</div>
 							</div>
-							<div class="compat-trow game-extrainfo${lr}">
+							<div class="compat-trow extrainfo${lr}">
 								<div class="compat-tcell first">
 									Game type: ${info.types[item.type]}<br/>
-									Tested on: <a href="https://github.com/RPCSX/rpcsx/commit/${item.rpcsx}" target="_blank">${item.rpcsx}</a><br/>
-									${item.comment !== '' ? 'Comment: ' + item.comment : ''}
+									Tested on: <a href="https://github.com/RPCSX/rpcsx/commit/${item.rpcsx}" target="_blank">${item.rpcsx}</a><br>
+									${item.comment !== '' ? 'Comment: ' + item.comment.replace('<[^>]*>', '') : ''}<br>
+									<a class="compat-edit-this" data-id="${ids[0]}" href="javascript:void(0);">Edit this game</a>
 								</div>
 							</div>
 						`);
@@ -136,7 +139,7 @@ window.addEventListener('load', () => {
 			alert('Failed to parse received response from server');
 		};
 
-		xhr.open('get', dburl + cpage + (query.length > 0 ? '?' + query.join('&') : ''));
+		xhr.open('get', '/db/' + cpage + (query.length > 0 ? '?' + query.join('&') : ''));
 		xhr.send();
 	};
 
@@ -156,7 +159,7 @@ window.addEventListener('load', () => {
 		setTimeout(() => info.classList.remove('close'), 255);
 	};
 
-	$('div.compat-table .compat-tbody').addEventListener('click', ({target}) => {
+	$('div.compat-table .compat-tbody').on('click', ({target}) => {
 		const pnode = target.parentNode;
 		if (pnode.classList.contains('compat-serial')) {
 			const a = document.createElement('a');
@@ -166,16 +169,22 @@ window.addEventListener('load', () => {
 			a.click();
 			a.remove();
 			return;
+		} else if (target.classList.contains('compat-edit-this')) {
+			import('./eloader.js').then(async ejs => {
+				await ejs.start(target.dataset.id);
+			});
+			return;
 		}
+
 		const tnode = target.classList.contains('.compat-trow') ? target : target.closest('div.compat-trow');
-		if (tnode.classList.contains('game-extrainfo')) return;
+		if (tnode.classList.contains('extrainfo')) return;
 		const info = getNextRowAfter(tnode);
 		if (info === null) return;
 
-		if (tnode.classList.toggle('game-expanded')) {
-			$$('.compat-trow.game-expanded').forEach(elem => {
+		if (tnode.classList.toggle('expanded')) {
+			$$('.compat-trow.expanded').forEach(elem => {
 				if (elem !== tnode) {
-					elem.classList.remove('game-expanded');
+					elem.classList.remove('expanded');
 					closeInfo(getNextRowAfter(elem));
 				}
 			});
@@ -197,36 +206,36 @@ window.addEventListener('load', () => {
 	$('div.compat-starts').innerHTML = htstitms.join('');
 
 	let inpupd = null;
-	$('div.compat-search input').addEventListener('input', ev => {
+	$('div.compat-search input').on('input', ev => {
 		if (inpupd !== null) clearTimeout(inpupd);
 		inpupd = setTimeout(() => {
 			setHashParam('f', ev.target.value);
 			inpupd = null;
 		}, 1000);
-	});
+	}, true);
 
-	$('div.compat-starts').addEventListener('click', ({target}) => {
+	$('div.compat-starts').on('click', ({target}) => {
 		setHashParam('s', target.dataset.value ?? '');
-	});
+	}, true);
 
-	$('div.compat-status').addEventListener('click', ({target}) => {
+	$('div.compat-status').on('click', ({target}) => {
 		if (target.tagName !== 'INPUT') return;
 		const curr = getHashParamInt('b');
 		const bit = parseInt(target.value);
 		setHashParam('b', target.checked ? curr | bit : curr & ~bit);
-	});
+	}, true);
 
-	$('div.compat-pages').addEventListener('click', ({target}) => {
+	$('div.compat-pages').on('click', ({target}) => {
 		if (target.tagName !== 'A') return;
 		setHashParam('p', target.innerText);
-	});
+	}, true);
 
-	$('div.compat-add-game').addEventListener('click', ev => {
-		import('./eloader.js').then(async ed => {
-			await ed.start();
+	$('div.compat-add-game').on('click', ev => {
+		import('./eloader.js').then(async ejs => {
+			await ejs.start();
 		});
-	});
+	}, true);
 
-	window.addEventListener('hashchange', updateTable);
+	window.on('hashchange', updateTable);
 	updateTable();
 });

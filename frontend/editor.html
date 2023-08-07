@@ -1,14 +1,43 @@
 <div class="editor-window">
 	<div class="editor-title editor-center">
-		<!-- TODO: Title??? -->
 		<span>CUSA00000</span>
-		<input type="text" placeholder="CUSA00000" maxlength="9"/>
+		<input type="text" pattern="^[A-Z]{4}[0-9]{5}$" placeholder="CUSA00000" maxlength="9"/>
 	</div>
-	<div class="editor-data">
-		<!-- TODO: Editor actually... -->
+	<div class="editor-main editor-center">
+		<div class="editor-data">
+			<input class="editor-gtitle" type="text" placeholder="Game title..."/>
+			<div class="editor-pstatus">
+				<select>
+					<option>Nothing</option>
+					<option>Loadable</option>
+					<option>Intro</option>
+					<option>Ingame</option>
+					<option>Playable</option>
+				</select>
+				<input type="text" placeholder="RPCSX commit..." minlength="7" maxlength="40"/>
+			</div>
+			<select class="editor-ptype"><option>Multiplatform</option><option>PlayStation™ exclusive</option><option>Console exclusive</option></select>
+			<select class="editor-gdistr"><option>Disk</option><option>PSN</option><option>Homebrew</option></select>
+			<div class="editor-regions">
+				<div class="editor-region">
+					<input type="text" pattern="^[A-Z]{4}[0-9]{5}$" maxlength="9" value="CUSA00000"/>
+					<select><option>WORLD</option><option>USA</option><option>EUR</option><option>JPN</option></select>
+				</div>
+				<div class="editor-region">
+					<input type="text" pattern="^[A-Z]{4}[0-9]{5}$" maxlength="9" placeholder="CUSA00001" value=""/>
+					<select><option>WORLD</option><option>USA</option><option>EUR</option><option>JPN</option></select>
+				</div>
+				<div class="editor-region" style="display: none;">
+					<input type="text" pattern="^[A-Z]{4}[0-9]{5}$" maxlength="9" placeholder="CUSA00002" value=""/>
+					<select><option>WORLD</option><option>USA</option><option>EUR</option><option>JPN</option></select>
+				</div>
+			</div>
+			<textarea class="game-comment" placeholder="Comment..."></textarea>
+			<span class="editor-subresult editor-center">Filler text</span>
+		</div>
 	</div>
 	<div class="editor-buttons editor-center">
-		<input type="button" id="editor-bclose" value="Close"/>
-		<input type="button" id="editor-bsend" value="Send"/>
+		<div class="compat-button" id="editor-bclose">Close</div>
+		<div class="compat-button" id="editor-bsend">Submit</div>
 	</div>
 </div>

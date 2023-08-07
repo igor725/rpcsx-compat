@@ -1,3 +1,25 @@
+* {
+	outline: none;
+}
+
+input, select, textarea {
+	background-color: #1f2231;
+	color: #e8e8e8;
+	border: none;
+}
+
+input:hover, select:hover {
+	background-color: #2c3044;
+}
+
+input[type="text"] {
+	caret-color: azure;
+}
+
+input[type="text"]::placeholder {
+	color: #e8e8e8;
+}
+
 body {
 	width: 100%;
 	height: 100%;
@@ -50,10 +72,17 @@ h2.compat-title {
 }
 
 .compat-status-line {
+	display: flex;
+	align-items: center;
 	width: 100%;
 	color: #e8e8e8;
 	font-size: medium;
 	margin-bottom: 15px;
+}
+
+.compat-status-line input {
+	margin-top: 0;
+	margin-bottom: 0;
 }
 
 .compat-search {
@@ -65,14 +94,18 @@ h2.compat-title {
 .compat-search input {
 	width: 100%;
 	height: 100%;
-	padding: 0;
 	margin: 0;
+	padding-left: 4px;
 	border-radius: 5px;
+}
+
+.compat-search input[type="text"]::placeholder, .compat-search input {
+	font-size: medium;
 }
 
 .compat-starts {
 	display: flex;
-	width: 100%;
+	width: 100.5%; /* Da fuq? */
 	height: 28px;
 	margin-bottom: 20px;
 	background-color: #191f36;
@@ -82,11 +115,9 @@ h2.compat-title {
 
 .compat-starts .item {
 	color: #e8e8e8;
-	display: inline-block;
 	user-select: none;
 	-webkit-user-drag: none;
 	overflow: hidden;
-	margin: 0 auto;
 	width: 100%;
 }
 
@@ -118,7 +149,11 @@ h2.compat-title {
 	grid-template-columns: 16% 1fr 15% 15%;
 }
 
-.compat-trow.last-row:not(.game-expanded) {
+.compat-trow:not(.extrainfo) {
+	cursor: pointer;
+}
+
+.compat-trow.last-row:not(.expanded) {
 	border-bottom: none;
 }
 
@@ -150,12 +185,17 @@ span.game-title {
 	border-left: none;
 }
 
-.compat-tbody .compat-trow:hover:not(.game-extrainfo) {
+.compat-tbody .compat-trow:hover:not(.extrainfo) {
 	background-color: #1f2231;
 }
 
 .compat-thead {
 	background-color: #7ea8f8;
+}
+
+.compat-thead .compat-tcell {
+	cursor: default;
+	color: #2a2f31;
 }
 
 .compat-serial {
@@ -166,26 +206,32 @@ span.game-title {
 .compat-serial img {
 	cursor: pointer;
 	vertical-align: middle;
-	width: 23px !important;
-	height: 23px !important;
+	width: 23px;
+	height: 23px;
 }
 
 .compat-serial a {
 	vertical-align: middle;
 }
 
-.compat-trow.game-extrainfo {
+.compat-trow.extrainfo {
 	display: none;
 	overflow: auto;
 	max-height: 0;
 }
 
-.compat-trow.game-extrainfo.open {
+.compat-trow .compat-edit-this {
+	position: relative;
+	top: 0;
+	right: 1;
+}
+
+.compat-trow.extrainfo.open {
 	display: block;
 	animation: open-extrainfo 250ms ease-in forwards;
 }
 
-.compat-trow.game-extrainfo.close {
+.compat-trow.extrainfo.close {
 	display: block;
 	animation: close-extrainfo 250ms ease-out forwards;
 }

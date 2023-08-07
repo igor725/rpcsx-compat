@@ -1,8 +1,10 @@
 import {onload} from './editor.js';
 
-const genHTML = () => {
+const genHTML = (gid) => {
 	const xhr = new XMLHttpRequest();
 	xhr.onload = () => {
+		const oldshadow = $('.editor-shadow');
+		if (oldshadow) oldshadow.remove();
 		const base = $('div.compat-base');
 		const body = document.body;
 		const shadow = document.createElement('div');
@@ -36,22 +38,22 @@ const genHTML = () => {
 		body.style.overflowY = 'hidden';
 		shadow.style.display = 'flex';
 		body.appendChild(shadow);
-		onload();
+		onload(gid);
 	};
 	xhr.open('get', 'editor.html');
 	xhr.send();
 };
 
-export const start = () => {
+export const start = (gid = null) => {
 	return new Promise((res, rej) => {
 		if ($('#editor-style'))
-			return res(genHTML());
+			return res(genHTML(gid));
 
 		const style = document.createElement('link');
 		style.id = 'editor-style';
 		style.href = 'css/eloader.css';
 		style.rel = 'stylesheet';
-		style.onload = () => res(genHTML());
+		style.onload = () => res(genHTML(gid));
 		document.head.appendChild(style);
 	});
 };
