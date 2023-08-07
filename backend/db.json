@@ -16,10 +16,10 @@
 		"ids": ["CUSA07010"],
 		"regions": [2],
 		"title": "Sonic Mania",
-		"updated": 1690923600000,
+		"updated": 1691452400000,
 		"type": 0,
 		"distr": 0,
-		"status": 2,
+		"status": 3,
 		"comment": "",
 		"rpcsx": "8a5eb8e5"
 	},
