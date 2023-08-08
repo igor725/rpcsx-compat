@@ -320,6 +320,10 @@ span.game-title {
 	height: 32px;
 }
 
+.compat-pages:empty {
+	display: none;
+}
+
 .compat-pages a {
 	display: inline-block;
 	width: 32px;
