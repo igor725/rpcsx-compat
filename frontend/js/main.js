@@ -4,6 +4,9 @@ window.$ = qs => document.querySelector(qs);
 window.$$ = qs => document.querySelectorAll(qs);
 Element.prototype.on = Element.prototype.addEventListener;
 
+import { startEditor } from './eloader.js';
+import { Request } from './request.js';
+
 window.on('load', () => {
 	const info = {
 		statuses: ['Nothing', 'Loadable', 'Intro', 'Ingame', 'Playable'],
@@ -43,25 +46,25 @@ window.on('load', () => {
 		if (starts !== null) query.push(`starts=${encodeURIComponent(starts)}`);
 		if (ibstat !== 0) query.push(`bstat=${ibstat}`);
 
-		const xhr = new XMLHttpRequest();
-		xhr.responseType = 'json';
-		xhr.onerror = () => {
-			$('table.compat-table tbody').innerHTML = '<tr><td style="text-align: center;" colspan=4>Server request failed. Please, try refreshing the page in 5 minutes.</td></tr>';
-			$('div.compat-pages').innerHTML = '';
-		};
-		xhr.onload = () => {
-			const res = xhr.response;
-			if (res !== null && typeof res === 'object' && !Array.isArray(res)) {
-				if (res.success === true) {
-					const items = res.items;
-					const pages = res.pages;
+		const url = '/api/db/' + cpage + (query.length > 0 ? '?' + query.join('&') : '');
+		(new Request(url)).callback((status, body) => {
+			if (!Request.success(status)) {
+				$('div.compat-tbody').innerHTML = '<div class="compat-trow reset"><div class="compat-tcell spanned">Server request failed. Please, try refreshing the page in 5 minutes.</div></div>';
+				$('div.compat-pages').innerHTML = '';
+				return;
+			}
+
+			if (body !== null && typeof body === 'object' && !Array.isArray(body)) {
+				if (body.success === true) {
+					const items = body.items;
+					const pages = body.pages;
 					if (pages > 0 && cpage > pages) {
 						setHashParam('p', pages);
 						return;
 					}
-					const overall = res.overall;
-					const max = overall.reduce((a, b) => a + b, 0);
 
+					const overall = body.overall;
+					const max = overall.reduce((a, b) => a + b, 0);
 					const htoverall = [];
 
 					for (let i = overall.length - 1; i >= 0; --i) {
@@ -132,15 +135,12 @@ window.on('load', () => {
 					return;
 				}
 
-				alert(`Error returned by server: ${res.message}`);
+				alert(`Error returned by server: ${body.message}`);
 				return;
 			}
 
 			alert('Failed to parse received response from server');
-		};
-
-		xhr.open('get', '/db/' + cpage + (query.length > 0 ? '?' + query.join('&') : ''));
-		xhr.send();
+		}).perform();
 	};
 
 	const getNextRowAfter = (row) => {
@@ -170,14 +170,19 @@ window.on('load', () => {
 			a.remove();
 			return;
 		} else if (target.classList.contains('compat-edit-this')) {
-			import('./eloader.js').then(async ejs => {
-				await ejs.start(target.dataset.id);
-			});
+			startEditor(target.dataset.id);
 			return;
 		}
 
 		const tnode = target.classList.contains('.compat-trow') ? target : target.closest('div.compat-trow');
-		if (tnode.classList.contains('extrainfo')) return;
+
+		if (tnode.classList.contains('extrainfo')) {
+			return;
+		} else if (tnode.classList.contains('reset')) {
+			updateTable();
+			return;
+		}
+
 		const info = getNextRowAfter(tnode);
 		if (info === null) return;
 
@@ -231,11 +236,25 @@ window.on('load', () => {
 	}, true);
 
 	$('div.compat-add-game').on('click', ev => {
-		import('./eloader.js').then(async ejs => {
-			await ejs.start();
-		});
+		startEditor();
 	}, true);
 
 	window.on('hashchange', updateTable);
 	updateTable();
+
+	(new Request('/api/ckey')).callback((status, body) => {
+		if (Request.success(status)) {
+			if (body.enabled === true) {
+				window.grecaptcha = false;
+				window._captcha_sitekey = body.key;
+				const gcscr = document.createElement('script');
+				gcscr.src = 'https://www.google.com/recaptcha/api.js?render=' + body.key;
+				gcscr.async = 'async';
+				document.head.appendChild(gcscr);
+				return
+			}
+
+			window.grecaptcha = 'disabled';
+		}
+	}).perform();
 });

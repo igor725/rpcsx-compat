@@ -1,3 +1,5 @@
+import { Request } from './request.js';
+
 export const onload = (load_id = null) => {
 	const root = $('.editor-root');
 	const main = $('.editor-main');
@@ -19,7 +21,14 @@ export const onload = (load_id = null) => {
 	tinput.style.width = `${trect.width + 6}px`;
 	tinput.style.height = `${trect.height}px`;
 
-	const pushGameRequest = () => {
+	const showStatus = (success, message) => {
+		esubresult.style.color = success ? 'green' : 'red';
+		esubresult.innerText = message;
+		esubresult.classList.add('show');
+		setTimeout(() => esubresult.classList.remove('show'), 4000);
+	};
+
+	const pushGameRequest = token => {
 		const game = {
 			uid: parseInt(data.dataset.uid ?? -1),
 			ids: [],
@@ -40,25 +49,20 @@ export const onload = (load_id = null) => {
 			game.regions[i] = regselects[i].selectedIndex;
 		}
 
-		const xhr = new XMLHttpRequest();
-		xhr.responseType = 'json';
-		xhr.onload = () => {
-			const res = xhr.response;
-			esubresult.style.color = res.success ? 'green' : 'red';
-			esubresult.innerText = res.message;
-			esubresult.classList.add('show');
-			setTimeout(() => esubresult.classList.remove('show'), 4000);
-		};
-		xhr.open('put', '/db');
-		xhr.setRequestHeader('content-type', 'application/json');
-		xhr.send(JSON.stringify(game));
+		(new Request('/api/db', 'put')).callback((status, body) => {
+			if (!Request.success(status)) {
+				showStatus(false, `Request failed with code ${status}`);
+				return;
+			}
+
+			showStatus(body.success, body.message);
+		}).perform({token: token, game: game});
 	};
 
 	const requestGameInfo = id => {
 		main.classList.add('editor-blur');
-		const xhr = new XMLHttpRequest();
-		xhr.responseType = 'json';
-		xhr.onload = () => {
+		(new Request('/api/find/' + id)).callback((status, body) => {
+			if (!Request.success(status)) return;
 			root.classList.add('expanded');
 			main.classList.add('editor-close');
 			setTimeout(() => {
@@ -66,9 +70,8 @@ export const onload = (load_id = null) => {
 				main.classList.remove('editor-close');
 			}, 255);
 
-			const res = xhr.response;
-			if (res !== null && typeof res === 'object' && res.success === true) {
-				const game = res.game;
+			if (body !== null && typeof body === 'object' && body.success === true) {
+				const game = body.game;
 				const gids = game.ids;
 				data.dataset.uid = game.uid;
 				gtitle.value = game.title;
@@ -101,9 +104,7 @@ export const onload = (load_id = null) => {
 				}
 				gcomment.value = '';
 			}
-		};
-		xhr.open('get', '/find/' + id);
-		xhr.send();
+		}).perform();
 	};
 
 	const finishEdit = () => {
@@ -202,7 +203,29 @@ export const onload = (load_id = null) => {
 				$('.editor-shadow').click();
 				break;
 			case 'editor-bsend':
-				pushGameRequest();
+				if (grecaptcha !== 'disabled') {
+					if (grecaptcha !== false) {
+						target.classList.add('busy');
+						grecaptcha.ready(() => {
+							try {
+								grecaptcha.execute(window._captcha_sitekey, {action: 'submit'}).then(token => {
+									pushGameRequest(token);
+									target.classList.remove('busy');
+								});
+							} catch (err) {
+								showStatus(false, err.message);
+								target.classList.remove('busy');
+							}
+						});
+
+						break;
+					}
+
+					showStatus(false, 'reCAPTCHA is not ready yet');
+					break;
+				}
+
+				pushGameRequest(null);
 				break;
 		}
 	});

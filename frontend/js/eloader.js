@@ -1,18 +1,23 @@
-import {onload} from './editor.js';
+import { onload } from './editor.js';
+import { Request } from './request.js';
 
 const genHTML = (gid) => {
-	const xhr = new XMLHttpRequest();
-	xhr.onload = () => {
+	(new Request('/editor.html')).callback((status, body) => {
+		if (!Request.success(status)) {
+			alert(`Failed to run editor: ${status}`);
+			return;
+		}
+
 		const oldshadow = $('.editor-shadow');
 		if (oldshadow) oldshadow.remove();
 		const base = $('div.compat-base');
-		const body = document.body;
+		const bodyel = document.body;
 		const shadow = document.createElement('div');
 		shadow.classList = 'editor-shadow';
 
 		const root = document.createElement('div');
 		root.classList = 'editor-root';
-		root.innerHTML = xhr.responseText;
+		root.innerHTML = body;
 		shadow.appendChild(root);
 
 		shadow.addEventListener('click', ev => {
@@ -21,7 +26,7 @@ const genHTML = (gid) => {
 				root.classList.add('editor-close');
 				shadow.classList.add('editor-close');
 				setTimeout(() => {
-					body.style.overflowY = null;
+					bodyel.style.overflowY = null;
 					base.classList.remove('editor-blur');
 					base.classList.remove('editor-close');
 					shadow.remove();
@@ -35,23 +40,21 @@ const genHTML = (gid) => {
 		});
 
 		base.classList.add('editor-blur');
-		body.style.overflowY = 'hidden';
+		bodyel.style.overflowY = 'hidden';
 		shadow.style.display = 'flex';
-		body.appendChild(shadow);
+		$('.compat-base').after(shadow);
 		onload(gid);
-	};
-	xhr.open('get', 'editor.html');
-	xhr.send();
+	}).perform();
 };
 
-export const start = (gid = null) => {
+export const startEditor = (gid = null) => {
 	return new Promise((res, rej) => {
 		if ($('#editor-style'))
 			return res(genHTML(gid));
 
 		const style = document.createElement('link');
 		style.id = 'editor-style';
-		style.href = 'css/eloader.css';
+		style.href = '/css/eloader.css';
 		style.rel = 'stylesheet';
 		style.onload = () => res(genHTML(gid));
 		document.head.appendChild(style);

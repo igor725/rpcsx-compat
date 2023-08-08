@@ -169,7 +169,7 @@ input.shake {
 	border-color: #242320;
 }
 
-div.compat-button {
+div.editor-button {
 	min-width: 20%;
 	margin-right: 5px;
 	cursor: pointer;
@@ -192,7 +192,24 @@ div.compat-button {
 	border-color: #235094;
 }
 
-div.compat-button:hover {
+div.editor-button.busy {
+	pointer-events: none;
+	border-color: #5f87c4;
+	background: linear-gradient(to right, #23273f 8%, #30354f 38%, #23273f 54%);
+	animation: loading 3s forwards infinite ease;
+	background-size: 440px 100%;
+}
+
+@keyframes loading {
+	0% {
+		background-position: 0 0
+	}
+	100% {
+		background-position: 440px 0
+	}
+  }
+
+div.editor-button:hover {
 	color: #fff;
 	background-color: #2b6fd4;
 	border-color: #0d6efd;

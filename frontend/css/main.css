@@ -58,8 +58,8 @@ h2.compat-title {
 	position: fixed !important;
 	width: 32px;
 	height: 32px;
-	right: 40px;
-	bottom: 40px;
+	right: 20px;
+	top: 20px;
 }
 
 .compat-add-game:hover {
@@ -162,6 +162,12 @@ h2.compat-title {
 	overflow: hidden;
 	border-left: 2px #7ea8f8 solid;
 	padding: 5px;
+}
+
+.compat-tcell.spanned {
+	grid-column-start: 1;
+	grid-column-end: 5;
+	text-align: center;
 }
 
 .compat-distr {

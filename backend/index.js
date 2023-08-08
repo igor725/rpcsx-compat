@@ -1,9 +1,12 @@
-const express = require('express');
-const jbodyparser = require('body-parser').json();
-const JValidator = require('jsonschema').Validator;
-const fs = require('fs');
-const app = express();
+import { request as httpRequest } from 'node:https';
+import express from 'express';
+import bparser from 'body-parser';
+import { Validator as JValidator } from 'jsonschema';
+import * as fs from 'node:fs';
+import { stringify as queryString } from 'node:querystring';
 
+const app = express();
+const jbodyparser = bparser.json();
 const jvalid = new JValidator();
 jvalid.addSchema({
 	type: 'object',
@@ -84,15 +87,22 @@ const dbschema = {
 	}
 };
 
+const openJSON = (path, def) =>
+	fs.existsSync(path) ? JSON.parse(fs.readFileSync(path, {encoding: 'utf8', flag: 'r'})) : def;
+
 const openDB = path => {
-	if (!fs.existsSync(path)) return [];
-	const jdata = JSON.parse(fs.readFileSync(path, {encoding: 'utf8', flag: 'r'}));
+	const jdata = openJSON(path, []);
 	const res = jvalid.validate(jdata, dbschema);
 	if (!res.valid) throw new Error(res.errors[0].toString());
 	return jdata;
 };
 
-const db = openDB('./db.json');
+const cfg = openJSON('../cfg.json', {
+	reCAPTCHA_enabled: false,
+	reCAPTCHA_secret: '',
+	reCAPTCHA_site: ''
+});
+const db = openDB('../db.json');
 const maxItemsPerPage = 20;
 const overall = [];
 let latestUID = -1;
@@ -123,9 +133,10 @@ const saveDB = (path) => {
 	fs.writeFileSync(path, JSON.stringify(db));
 };
 
+app.use('/assets', express.static('../assets/'));
 app.use('/', express.static('../frontend/'));
 
-app.get('/find/:code', (req, res) => {
+app.get('/api/find/:code', (req, res) => {
 	res.setHeader('content-type', 'application/json');
 
 	const {code} = req.params;
@@ -141,7 +152,7 @@ app.get('/find/:code', (req, res) => {
 	res.send('{"success": false, "message": "No game found"}');
 });
 
-app.get('/game/:uid', (req, res) => {
+app.get('/api/game/:uid', (req, res) => {
 	res.setHeader('content-type', 'application/json');
 
 	const uid = parseInt(req.params.uid);
@@ -174,30 +185,92 @@ const isSomethingChanged = game => {
 		   !compareArrays(game.ids, ogame.ids);
 };
 
-app.put('/db', jbodyparser, (req, res) => {
+app.get('/api/ckey', (req, res) => {
 	res.setHeader('content-type', 'application/json');
-	const game = req.body;
-	const result = jvalid.validate(game, {$ref: '/DBEntry'});
-	const resp = {success: true, message: ''};
-
-	if (result.valid === true) {
-		if (!isSomethingChanged(game)) {
-			resp.success = false;
-			resp.message = 'Nothing changed! Your suggestion was rejected.';
-		} else {
-			// TODO: Save it
-			console.log(game);
-			resp.message = 'Suggestion submitted, thank you!';
-		}
-	} else {
-		resp.success = false;
-		resp.message = result.errors[0].toString();
-	}
-
-	res.send(JSON.stringify(resp));
+	const jres = {enabled: cfg.reCAPTCHA_enabled};
+	if (jres.enabled) jres.key = cfg.reCAPTCHA_site;
+	res.send(JSON.stringify(jres));
 });
 
-app.get('/db/:page', (req, res) => {
+const suggestGameInfo = async (game, robj, ip) => {
+	const result = jvalid.validate(game, {$ref: '/DBEntry'});
+	if (result.valid === true) {
+		if (!isSomethingChanged(game)) {
+			robj.success = false;
+			robj.message = 'Nothing changed! Your suggestion was rejected.';
+		} else {
+			const fname = `us-${Buffer.from(ip).toString('base64')}-${Date.now()}.json`;
+			try {
+				fs.writeFileSync(fname, JSON.stringify(game));
+
+				robj.success = true;
+				robj.message = 'Suggestion submitted, thank you!';
+			} catch (err) {
+				console.error(err);
+				robj.success = false;
+				robj.message = 'I/O error on the server side.'
+			}
+		}
+	} else {
+		robj.success = false;
+		robj.message = result.errors[0].toString();
+	}
+};
+
+app.set('trust proxy', false);
+
+app.put('/api/db', jbodyparser, async (req, res) => {
+	res.setHeader('content-type', 'application/json');
+	const robj = {success: false, message: ''};
+	const body = req.body;
+
+	if (cfg.reCAPTCHA_enabled === false) {
+		suggestGameInfo(body.game, robj, req.ip);
+		return;
+	}
+
+	const gpostData = queryString({secret: cfg.reCAPTCHA_secret, response: body.token});
+	const greq = httpRequest({
+		hostname: 'www.google.com',
+		port: 443,
+		method: 'POST',
+		path: '/recaptcha/api/siteverify',
+		headers: {
+			'Content-Type': 'application/x-www-form-urlencoded',
+			'Content-Length': gpostData.length
+		}
+	}, gres => {
+		const data = [];
+
+		gres.on('data', d => {
+			data.push(d);
+		});
+
+		gres.on('end', () => {
+			const grbody = JSON.parse(Buffer.concat(data));
+			if (grbody.success) {
+				suggestGameInfo(body.game, robj, req.ip);
+			} else {
+				robj.success = false;
+				robj.message = 'reCAPTCHA test failed';
+			}
+		});
+	});
+
+	greq.on('error', e => {
+		robj.success = false;
+		robj.message = e.message;
+	});
+
+	greq.on('close', () => {
+		res.send(JSON.stringify(robj));
+	});
+
+	greq.write(gpostData);
+	greq.end();
+});
+
+app.get('/api/db/:page', (req, res) => {
 	res.setHeader('content-type', 'application/json');
 
 	const pagen = parseInt(req.params.page);

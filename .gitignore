@@ -1,0 +1,5 @@
+node_modules/
+/suggestions/*
+!/suggestions/.empty
+/cfg.json
+#/db.json
