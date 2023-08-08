@@ -256,7 +256,7 @@ app.put('/api/db', jbodyparser, async (req, res) => {
 				suggestGameInfo(body.game, robj, req.ip);
 			} else {
 				robj.success = false;
-				robj.message = 'reCAPTCHA test failed';
+				robj.message = `reCAPTCHA verification failed: ${grbody['error-codes'][0]}`;
 			}
 		});
 	});
