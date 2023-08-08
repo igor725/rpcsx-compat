@@ -17,7 +17,7 @@
 	left: 0;
 	width: 100%;
 	height: 100%;
-	background-color: #00000069;
+	background-color: var(--editor-shadow);
 	transition: opacity 250ms;
 	opacity: 1;
 }
@@ -32,7 +32,6 @@
 	border-radius: 5px;
 	pointer-events: all;
 	transition: height 250ms, width 250ms;
-	background-color: #23273f;
 }
 
 .editor-root:not(.expanded) {
@@ -55,6 +54,7 @@
 	height: 100%;
 	grid-template-columns: 1fr;
 	grid-template-rows: 40px 1fr 50px;
+	background-color: var(--editor-window);
 }
 
 .editor-data {
@@ -132,10 +132,6 @@
 	font-size: large;
 }
 
-.editor-title span {
-	color: #e8e8e8;
-}
-
 .editor-title input {
 	display: none;
 	border: none;
@@ -153,8 +149,8 @@
 }
 
 #editor-bclose:hover {
-	background-color: #b61509;
-	border-color: #242320;
+	background-color: var(--editor-bclose-bg);
+	border-color: var(--editor-bclose-border);
 }
 
 div.editor-button {
@@ -166,8 +162,8 @@ div.editor-button {
 	font-weight: 400;
 	line-height: 1.5;
 	text-align: center;
-	background-color: transparent;
-	border: 1px solid transparent;
+	background-color: var(--editor-button-bg);
+	border: 1px solid var(--editor-button-border);
 	user-select: none;
 	padding: 6px 12px;
 	font-size: medium;
@@ -176,14 +172,17 @@ div.editor-button {
 				background-color .15s ease-in-out,
 				border-color .15s ease-in-out,
 				box-shadow .15s ease-in-out;
-	color: #5792e9;
-	border-color: #235094;
+	color: var(--editor-button-text);
 }
 
 div.editor-button.busy {
 	pointer-events: none;
-	border-color: #5f87c4;
-	background: linear-gradient(to right, #23273f 8%, #30354f 38%, #23273f 54%);
+	border-color: var(--editor-button-busy-border);
+	background: linear-gradient(to right,
+									var(--editor-button-busy-gradient-from) 8%,
+									var(--editor-button-busy-gradient-to) 38%,
+									var(--editor-button-busy-gradient-from) 54%
+								);
 	animation: loading 3s forwards infinite ease;
 	background-size: 440px 100%;
 }
@@ -199,6 +198,7 @@ div.editor-button.busy {
 
 div.editor-button:hover {
 	color: #fff;
-	background-color: #2b6fd4;
-	border-color: #0d6efd;
+	background-color: var(--editor-button-hover-bg);
+	border-color: var(--editor-button-hover-border);
+	border-width: 2px;
 }
