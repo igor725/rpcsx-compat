@@ -41,7 +41,7 @@ const genHTML = (gid) => {
 
 		base.classList.add('editor-blur');
 		bodyel.style.overflowY = 'hidden';
-		shadow.style.display = 'flex';
+		shadow.style.visibility = 'visible';
 		$('.compat-base').after(shadow);
 		onload(gid);
 	}).perform();

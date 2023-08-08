@@ -3,6 +3,8 @@ window.on = window.addEventListener;
 window.$ = qs => document.querySelector(qs);
 window.$$ = qs => document.querySelectorAll(qs);
 Element.prototype.on = Element.prototype.addEventListener;
+Element.prototype.$ = Element.prototype.querySelector;
+Element.prototype.$$ = Element.prototype.querySelectorAll;
 
 import { startEditor } from './eloader.js';
 import { Request } from './request.js';
@@ -70,9 +72,11 @@ window.on('load', () => {
 					for (let i = overall.length - 1; i >= 0; --i) {
 						htoverall.push(`
 							<div class="compat-status-line">
-								<input type="checkbox" value="${1 << i}"${(ibstat & (1 << i)) > 0 ? ' checked' : ''}/>
-								<strong style="color: ${info.colors[i]}">${info.statuses[i]} (${((overall[i] / max) * 100).toFixed(2)}%)</strong>:
-								${info.expls[i]}
+								<div class="status-title">
+									<input type="checkbox" value="${1 << i}"${(ibstat & (1 << i)) > 0 ? ' checked' : ''}/>
+									<strong style="color: ${info.colors[i]}">${info.statuses[i]} (${((overall[i] / max) * 100).toFixed(2)}%)</strong>:
+								</div>
+								<div class="scrollable-text">${info.expls[i]}</div>
 							</div>
 						`);
 					}
@@ -108,8 +112,8 @@ window.on('load', () => {
 							<div class="compat-trow extrainfo${lr}">
 								<div class="compat-tcell first">
 									Game type: ${info.types[item.type]}<br/>
-									Tested on: <a href="https://github.com/RPCSX/rpcsx/commit/${item.rpcsx}" target="_blank">${item.rpcsx}</a><br>
-									${item.comment !== '' ? 'Comment: ' + item.comment.replace('<[^>]*>', '') : ''}<br>
+									Tested on: <a href="https://github.com/RPCSX/rpcsx/commit/${item.rpcsx}" target="_blank">${item.rpcsx}</a>
+									${item.comment !== '' ? '<br>Comment: ' + item.comment.replace('<[^>]*>', '') : ''}<br>
 									<a class="compat-edit-this" data-id="${ids[0]}" href="javascript:void(0);">Edit this game</a>
 								</div>
 							</div>
@@ -145,9 +149,9 @@ window.on('load', () => {
 
 	const getNextRowAfter = (row) => {
 		do {
-			row = row.nextElementSibling ?? row.nextSibling;
+			row = row.nextElementSibling;
 			if (row === null) break;
-		} while (row.nodeType !== Node.ELEMENT_NODE || row.classList.contains('.compat-trow'));
+		} while (row.classList.contains('.compat-trow'));
 
 		return row;
 	};
@@ -217,27 +221,38 @@ window.on('load', () => {
 			setHashParam('f', ev.target.value);
 			inpupd = null;
 		}, 1000);
-	}, true);
+	});
 
 	$('div.compat-starts').on('click', ({target}) => {
 		setHashParam('s', target.dataset.value ?? '');
-	}, true);
+	});
 
 	$('div.compat-status').on('click', ({target}) => {
 		if (target.tagName !== 'INPUT') return;
 		const curr = getHashParamInt('b');
 		const bit = parseInt(target.value);
 		setHashParam('b', target.checked ? curr | bit : curr & ~bit);
-	}, true);
+	});
 
 	$('div.compat-pages').on('click', ({target}) => {
 		if (target.tagName !== 'A') return;
 		setHashParam('p', target.innerText);
-	}, true);
+	});
 
-	$('div.compat-add-game').on('click', ev => {
-		startEditor();
-	}, true);
+	$('div.compat-rbuttons').on('click', ({target}) => {
+		if (!target.classList.contains('compat-rbutton')) return;
+
+		switch (target.dataset.action) {
+			case 'addgame':
+				startEditor();
+				break;
+
+			default:
+				target.classList.add('shake');
+				setTimeout(() => target.classList.remove('shake'), 255);
+				break;
+		}
+	});
 
 	window.on('hashchange', updateTable);
 	updateTable();

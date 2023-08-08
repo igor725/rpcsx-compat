@@ -19,17 +19,11 @@
 			<select class="editor-ptype"><option>Multiplatform</option><option>PlayStation™ exclusive</option><option>Console exclusive</option></select>
 			<select class="editor-gdistr"><option>Disk</option><option>PSN</option><option>Homebrew</option></select>
 			<div class="editor-regions">
-				<div class="editor-region">
-					<input type="text" pattern="^[A-Z]{4}[0-9]{5}$" maxlength="9" value="CUSA00000"/>
-					<select><option>WORLD</option><option>USA</option><option>EUR</option><option>JPN</option></select>
-				</div>
-				<div class="editor-region">
-					<input type="text" pattern="^[A-Z]{4}[0-9]{5}$" maxlength="9" placeholder="CUSA00001" value=""/>
-					<select><option>WORLD</option><option>USA</option><option>EUR</option><option>JPN</option></select>
-				</div>
-				<div class="editor-region" style="display: none;">
-					<input type="text" pattern="^[A-Z]{4}[0-9]{5}$" maxlength="9" placeholder="CUSA00002" value=""/>
-					<select><option>WORLD</option><option>USA</option><option>EUR</option><option>JPN</option></select>
+				<div class="editor-regrid">
+					<div class="editor-region">
+						<input type="text" pattern="^[A-Z]{4}[0-9]{5}$" maxlength="9" placeholder="CUSA00000"/>
+						<select><option>WORLD</option><option>USA</option><option>EUR</option><option>JPN</option></select>
+					</div>
 				</div>
 			</div>
 			<textarea class="game-comment" placeholder="Comment..."></textarea>

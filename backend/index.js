@@ -19,6 +19,7 @@ jvalid.addSchema({
 		ids: {
 			type: 'array',
 			required: true,
+			minItems: 1,
 			items: {
 				type: 'string',
 				pattern: '^[A-Z]{4}[0-9]{5}$',
@@ -29,6 +30,7 @@ jvalid.addSchema({
 		regions: {
 			type: 'array',
 			required: true,
+			minItems: 1,
 			items: {
 				type: 'number',
 				minimum: 0,
@@ -38,6 +40,7 @@ jvalid.addSchema({
 		title: {
 			type: 'string',
 			required: true,
+			minLength: 2,
 			pattern: '^[A-Za-z0-9\x20-\x3C\x3F\x40]+$'
 		},
 		updated: {
@@ -199,7 +202,8 @@ const suggestGameInfo = async (game, robj, ip) => {
 			robj.success = false;
 			robj.message = 'Nothing changed! Your suggestion was rejected.';
 		} else {
-			const fname = `us-${Buffer.from(ip).toString('base64')}-${Date.now()}.json`;
+			const fname = `../suggestions/us-${Buffer.from(ip).toString('base64')}-${Date.now()}.json`;
+
 			try {
 				fs.writeFileSync(fname, JSON.stringify(game));
 

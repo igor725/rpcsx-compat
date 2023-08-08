@@ -11,11 +11,9 @@ export const onload = (load_id = null) => {
 	const pcommit = $('.editor-data > .editor-pstatus > input[type="text"]');
 	const ptype = $('.editor-data > .editor-ptype');
 	const gdistr = $('.editor-data > .editor-gdistr');
-	const regions = $$('.editor-data > .editor-regions > .editor-region');
-	const reginputs = $$('.editor-data > .editor-regions > .editor-region > input');
-	const regselects = $$('.editor-data > .editor-regions > .editor-region > select');
 	const gcomment = $('.editor-data > .game-comment');
 	const esubresult = $('.editor-data > .editor-subresult');
+	const regions = $('.editor-regions');
 
 	const trect = titext.getBoundingClientRect();
 	tinput.style.width = `${trect.width + 6}px`;
@@ -42,11 +40,13 @@ export const onload = (load_id = null) => {
 			rpcsx: pcommit.value
 		};
 
-		for (let i = 0; i < regions.length; i++) {
-			if (reginputs[i].value === '') break;
-			if (!reginputs[i].reportValidity()) return;
-			game.ids[i] = reginputs[i].value;
-			game.regions[i] = regselects[i].selectedIndex;
+		const regions = $$('.editor-region');
+		for (let i = 0; i < regions.length; ++i) {
+			const region = regions[i];
+			const code = region.$('input').value;
+			if (code === '') break;
+			game.ids[i] = code;
+			game.regions[i] = region.$('select').selectedIndex;
 		}
 
 		(new Request('/api/db', 'put')).callback((status, body) => {
@@ -73,22 +73,32 @@ export const onload = (load_id = null) => {
 			if (body !== null && typeof body === 'object' && body.success === true) {
 				const game = body.game;
 				const gids = game.ids;
+				const gregs = game.regions;
 				data.dataset.uid = game.uid;
 				gtitle.value = game.title;
 				pstat.selectedIndex = game.status;
 				pcommit.value = game.rpcsx;
 				ptype.selectedIndex = game.type;
 				gdistr.selectedIndex = game.distr;
-				for (let i = 0; i < regions.length; ++i) {
-					if (gids[i] === undefined && i > 1) {
-						regions[i].style.display = 'none';
-						continue;
-					} else {
-						regions[i].style.display = null;
-						regselects[i].selectedIndex = game.regions[i];
-						reginputs[i].value = gids[i] ?? '';
+
+				let region = $('.editor-region');
+				for (let i = 0; i < gids.length; ++i) {
+					const input = region.$('input');
+					input.value = gids[i];
+					region.$('select').selectedIndex = gregs[i];
+					input.dispatchEvent(new Event('input'));
+					region = region.nextElementSibling ?? region.parentNode.nextElementSibling.$('.editor-region');
+				}
+
+				const regions = $$('.editor-region');
+				for (let i = regions.length - 1; i >= gids.length; --i) {
+					const input = regions[i].$('input');
+					if (input.value !== '' || i === 0) {
+						input.value = i === 0 ? id : '';
+						input.dispatchEvent(new Event('input'));
 					}
 				}
+
 				gcomment.value = game.comment;
 			} else {
 				data.dataset.uid = -1;
@@ -97,11 +107,16 @@ export const onload = (load_id = null) => {
 				pcommit.value = '';
 				ptype.selectedIndex = 0;
 				gdistr.selectedIndex = 0;
-				for (let i = 0; i < regions.length; ++i) {
-					if (i > 1) regions[i].style.display = 'none';
-					regselects[i].selectedIndex = i;
-					reginputs[i].value = i > 0 ? '' : id;
+
+				const regions = $$('.editor-region');
+				for (let i = regions.length - 1; i >= 0; --i) {
+					const input = regions[i].$('input');
+					if (input.value !== '' || i === 0) {
+						input.value = i === 0 ? id : '';
+						input.dispatchEvent(new Event('input'));
+					}
 				}
+
 				gcomment.value = '';
 			}
 		}).perform();
@@ -133,13 +148,7 @@ export const onload = (load_id = null) => {
 			target.reportValidity();
 			validitytimer2 = null;
 		}, 1000);
-
-		if (target === reginputs[1]) {
-			const shown = target.value.length > 0;
-			regions[2].style.display = shown ? 'block' : 'none';
-			if (shown == false) reginputs[2].value = '';
-		}
-	});
+	}, true);
 
 	const blurChecker = (target) => {
 		if (!target.checkValidity()) {
@@ -159,9 +168,52 @@ export const onload = (load_id = null) => {
 		return true;
 	};
 
-	$('.editor-regions').on('blur', ({target}) => {
+	regions.on('blur', ({target}) => {
 		if (target.tagName !== 'INPUT') return;
-		blurChecker(target);
+		if (blurChecker(target) && target.dataset.restore === '1') {
+			target.dataset.restore = null;
+			target.value = 'CUSA00000';
+		}
+	}, true);
+
+	const cloneRegion = reg => {
+		const newregion = reg.cloneNode(true);
+		newregion.$('select').selectedIndex = 0;
+		newregion.$('input').value = '';
+		return newregion;
+	};
+
+	regions.on('input', ({target}) => {
+		const region = target.parentNode;
+		const nextregion = region.nextElementSibling;
+		const regrid = region.parentNode;
+		const regridregs = regrid.$$('.editor-region');
+		const nextregrid = regrid.nextElementSibling;
+
+		if (nextregion === null && regridregs.length === 1) {
+			regrid.appendChild(cloneRegion(region));
+		} else if (nextregrid === null && nextregion === null) {
+			const newregrid = regrid.cloneNode();
+			newregrid.appendChild(cloneRegion(region));
+			regions.appendChild(newregrid);
+		} else if (target.value === '') {
+			if (regridregs.length === 2) {
+				const regridnextinput = regridregs[1].$('input');
+				if (regridnextinput === target) {
+					if (nextregrid.$$('.editor-region').length > 1) {
+						target.dataset.restore = '1';
+					} else {
+						nextregrid.remove();
+					}
+				} else if (regridnextinput.value === '') {
+					nextregion.remove();
+				} else {
+					target.dataset.restore = '1';
+				}
+			} else if (nextregion === null) {
+				regrid.remove();
+			}
+		}
 	}, true);
 
 	let validitytimer = null;
