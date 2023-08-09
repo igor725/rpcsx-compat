@@ -1,5 +1,6 @@
 * {
 	outline: none;
+	font-size: 1em;
 	box-sizing: border-box;
 	color: var(--default-text);
 }
@@ -78,7 +79,7 @@ h2.compat-title {
 	align-items: center;
 	text-align: center;
 	color: var(--rbutton-text);
-	font-size: xx-large;
+	font-size: 2em;
 	border-radius: 5px;
 	margin-right: 10px;
 	background-color: var(--rbutton-bg);
@@ -102,7 +103,6 @@ h2.compat-title {
 	align-items: center;
 	flex-grow: 1;
 	width: 100%;
-	font-size: medium;
 	margin-bottom: 15px;
 }
 
@@ -141,10 +141,6 @@ h2.compat-title {
 	margin: 0;
 	padding-left: 4px;
 	border-radius: 5px;
-}
-
-.compat-search input[type="text"]::placeholder, .compat-search input {
-	font-size: medium;
 }
 
 .compat-starts {
@@ -189,7 +185,7 @@ h2.compat-title {
 .compat-trow {
 	display: grid;
 	border-bottom: 2px var(--table-border) solid;
-	grid-template-columns: 7.5rem 1fr 7rem 5rem;
+	grid-template-columns: 7.5em 1fr 7em 5em;
 }
 
 .compat-trow:not(.extrainfo) {
@@ -322,7 +318,7 @@ span.game-title {
 	width: 32px;
 	height: 32px;
 	margin-right: 6px;
-	font-size: x-large;
+	font-size: 1.5em;
 	border-radius: 5px;
 	background-color: var(--pagebtn-bg);
 	-webkit-user-drag: none;

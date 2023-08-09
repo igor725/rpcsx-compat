@@ -16,17 +16,17 @@
 
 .editor-root:not(.expanded) .editor-data {
 	visibility: hidden;
+	overflow: hidden;
 }
 
 .editor-data > * {
 	width: 100%;
 	margin-bottom: 15px;
-	font-size: medium;
 }
 
 .editor-regions {
 	display: inline-flex;
-	overflow-x: scroll;
+	overflow-x: auto;
 	overflow-y: hidden;
 	height: 146px;
 }
@@ -46,7 +46,7 @@
 }
 
 .editor-region input[type="text"] {
-	width: 72px;
+	width: 11ch;
 }
 
 .editor-main {
@@ -67,7 +67,7 @@
 }
 
 .editor-data .editor-subresult {
-	font-size: small;
+	font-size: 0.8em;
 	user-select: none;
 	margin-bottom: 0px;
 	transition: opacity 400ms;
@@ -78,18 +78,14 @@
 	opacity: 1;
 }
 
-.editor-title {
-	font-size: large;
-}
-
-.editor-title input::placeholder {
-	font-size: large;
+.editor-title span {
+	font-size: 1.2em;
 }
 
 .editor-title input {
 	display: none;
 	border: none;
-	font-size: large;
+	font-size: 1.2em;
 }
 
 .editor-center {
@@ -120,7 +116,6 @@ div.editor-button {
 	border: 1px solid var(--editor-button-border);
 	user-select: none;
 	padding: 6px 12px;
-	font-size: medium;
 	border-radius: 5px;
 	transition: color .15s ease-in-out,
 				background-color .15s ease-in-out,
