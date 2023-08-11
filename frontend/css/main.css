@@ -5,6 +5,20 @@
 	color: var(--default-text);
 }
 
+.smooth-blur {
+	filter: blur(6px);
+	-webkit-transition: -webkit-filter 250ms;
+	-moz-transition: -moz-filter 250ms;
+	-moz-transition: filter 250ms;
+	-ms-transition: -ms-filter 250ms;
+	-o-transition: -o-filter 250ms;
+	transition: filter 250ms, -webkit-filter 250ms;
+}
+
+.smooth-blur.close {
+	filter: blur(0) !important;
+}
+
 input, select, textarea {
 	background-color: var(--inputs-bg);
 	border: none;
@@ -38,9 +52,9 @@ h2.compat-title {
 }
 
 .shake {
-	border: 2px var(--shake-border) solid;
-	animation: shake-that-ass 100ms;
-	animation-iteration-count: 4;
+	border: 2px var(--shake-border) solid !important;
+	animation: shake-that-ass 100ms !important;
+	animation-iteration-count: 4 !important;
 }
 
 @keyframes shake-that-ass {
@@ -71,6 +85,21 @@ h2.compat-title {
 	position: fixed;
 	top: 40px;
 	right: 20px;
+}
+
+/*
+	For some reason fixed objects jumps to the left a little when the parent
+	gets blured. I don't know what the fuck is going on here, but I don't
+	wanna see this jumping mess, so opacity 0.
+*/
+.compat-base.smooth-blur > .compat-rbuttons {
+	opacity: 0;
+	right: 0px;
+}
+
+.compat-base:not(.smooth-blur) > .compat-rbuttons {
+	transition: opacity 340ms, right 250ms;
+	opacity: 1;
 }
 
 .compat-rbutton {

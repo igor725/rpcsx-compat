@@ -33,19 +33,18 @@
 
 	--footer-text: #9ca2b1;
 
-	/* Editor */
-	--editor-shadow: #00000069;
-	--editor-window: #23273f;
+	/* UI */
+	--win-shadow: #00000069;
+	--window: #23273f;
 
-	--editor-button-bg: transparent;
-	--editor-button-border: #235094;
-	--editor-button-text: #5792e9;
-	--editor-button-busy-border: #5f87c4;
-	--editor-button-busy-gradient-from: #23273f;
-	--editor-button-busy-gradient-to: #30354f;
-	--editor-button-hover-bg: #2b6fd420;
-	--editor-button-hover-border: #0d6efd;
-
-	--editor-bclose-bg: #d11b0e13;
-	--editor-bclose-border: #d12207;
+	--win-button-bg: transparent;
+	--win-button-border: #235094;
+	--win-button-text: #5792e9;
+	--win-button-busy-border: #5f87c4;
+	--win-button-busy-gradient-from: #23273f;
+	--win-button-busy-gradient-to: #30354f;
+	--win-button-hover-bg: #2b6fd420;
+	--win-button-hover-border: #0d6efd;
+	--win-button-close-bg: #d11b0e13;
+	--win-button-close-border: #d12207;
 }

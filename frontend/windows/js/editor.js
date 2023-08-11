@@ -1,7 +1,6 @@
-import { Request } from './request.js';
+import { Request } from '../../js/request.js';
 
-export const onload = (load_id = null) => {
-	const root = $('.editor-root');
+export const onload = load_id => {
 	const main = $('.editor-main');
 	const data = $('.editor-main > .editor-data');
 	const titext = $('.editor-title span');
@@ -60,14 +59,14 @@ export const onload = (load_id = null) => {
 	};
 
 	const requestGameInfo = id => {
-		main.classList.add('editor-blur');
+		main.classList.add('smooth-blur');
 		(new Request('/api/find/' + id)).callback((status, body) => {
 			if (!Request.success(status)) return;
-			root.classList.add('expanded');
-			main.classList.add('editor-close');
+			$('.win-root').classList.add('expanded');
+			main.classList.add('close');
 			setTimeout(() => {
-				main.classList.remove('editor-blur');
-				main.classList.remove('editor-close');
+				main.classList.remove('smooth-blur');
+				main.classList.remove('close');
 			}, 255);
 
 			if (body !== null && typeof body === 'object' && body.success === true) {
@@ -249,37 +248,30 @@ export const onload = (load_id = null) => {
 		titext.style.display = 'block';
 	});
 
-	$('.editor-buttons').on('click', ({target}) => {
-		switch (target.id) {
-			case 'editor-bclose':
-				$('.editor-shadow').click();
-				break;
-			case 'editor-bsend':
-				if (grecaptcha !== 'disabled') {
-					if (grecaptcha !== false) {
-						target.classList.add('busy');
-						grecaptcha.ready(() => {
-							try {
-								grecaptcha.execute(window._captcha_sitekey, {action: 'submit'}).then(token => {
-									pushGameRequest(token);
-									target.classList.remove('busy');
-								});
-							} catch (err) {
-								showStatus(false, err.message);
-								target.classList.remove('busy');
-							}
+	$('.editor-submit').on('click', ({target}) => {
+		if (grecaptcha !== 'disabled') {
+			if (grecaptcha !== false) {
+				target.classList.add('busy');
+				grecaptcha.ready(() => {
+					try {
+						grecaptcha.execute(window._captcha_sitekey, {action: 'submit'}).then(token => {
+							pushGameRequest(token);
+							target.classList.remove('busy');
 						});
-
-						break;
+					} catch (err) {
+						showStatus(false, err.message);
+						target.classList.remove('busy');
 					}
+				});
 
-					showStatus(false, 'reCAPTCHA is not ready yet');
-					break;
-				}
+				return;
+			}
 
-				pushGameRequest(null);
-				break;
+			showStatus(false, 'reCAPTCHA is not ready yet');
+			return;
 		}
+
+		pushGameRequest(null);
 	});
 
 	if (load_id !== null) {

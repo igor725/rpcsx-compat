@@ -6,7 +6,7 @@ Element.prototype.on = Element.prototype.addEventListener;
 Element.prototype.$ = Element.prototype.querySelector;
 Element.prototype.$$ = Element.prototype.querySelectorAll;
 
-import { startEditor } from './eloader.js';
+import { open as openWindow } from './wloader.js';
 import { Request } from './request.js';
 
 window.on('load', () => {
@@ -174,7 +174,7 @@ window.on('load', () => {
 			a.remove();
 			return;
 		} else if (target.classList.contains('compat-edit-this')) {
-			startEditor(target.dataset.id);
+			openWindow('editor', target.dataset.id);
 			return;
 		}
 
@@ -242,16 +242,10 @@ window.on('load', () => {
 	$('div.compat-rbuttons').on('click', ({target}) => {
 		if (!target.classList.contains('compat-rbutton')) return;
 
-		switch (target.dataset.action) {
-			case 'addgame':
-				startEditor();
-				break;
-
-			default:
-				target.classList.add('shake');
-				setTimeout(() => target.classList.remove('shake'), 255);
-				break;
-		}
+		openWindow(target.dataset.action).catch(err => {
+			target.classList.add('shake');
+			setTimeout(() => target.classList.remove('shake'), 255);
+		});
 	});
 
 	window.on('hashchange', updateTable);

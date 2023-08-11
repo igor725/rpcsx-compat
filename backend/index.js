@@ -8,6 +8,11 @@ import { stringify as queryString } from 'node:querystring';
 const app = express();
 const jbodyparser = bparser.json();
 const jvalid = new JValidator();
+const htmlDetection = {
+	id: 'HTML string',
+	pattern: '<[^>]*>'
+};
+
 jvalid.addSchema({
 	type: 'object',
 	properties: {
@@ -41,7 +46,8 @@ jvalid.addSchema({
 			type: 'string',
 			required: true,
 			minLength: 2,
-			pattern: '^[A-Za-z0-9\x20-\x3C\x3F\x40]+$'
+			not: htmlDetection,
+			pattern: '^[\x20-\x7F]+$'
 		},
 		updated: {
 			type: 'integer',
@@ -70,7 +76,7 @@ jvalid.addSchema({
 			type: 'string',
 			required: true,
 			maxLength: 1024,
-			not: {id: '[detected HTML code]', pattern: '<[^>]*>'}
+			not: htmlDetection
 		},
 		rpcsx: {
 			type: 'string',
@@ -81,6 +87,7 @@ jvalid.addSchema({
 		},
 	}
 }, '/DBEntry');
+
 
 const dbschema = {
 	type: 'array',
