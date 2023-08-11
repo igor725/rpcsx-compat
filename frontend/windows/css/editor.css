@@ -92,12 +92,6 @@
 	font-size: 1.2em;
 }
 
-.editor-center {
-	display: flex;
-	justify-content: center;
-	align-items: center;
-}
-
 .win-root.editor:not(.expanded) .editor-submit {
 	display: none;
 }

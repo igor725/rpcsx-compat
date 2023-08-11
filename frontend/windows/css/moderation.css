@@ -2,3 +2,66 @@
 	width: 40%;
 	height: 320px;
 }
+
+.moder-key {
+	display: none;
+	width: 100%;
+	height: 100%;
+}
+
+.moder-key input[type="text"] {
+	width: 60%;
+}
+
+.moder-data {
+	display: block;
+}
+
+.moderation.auth-fail > .moder-fail {
+	display: flex;
+	text-align: center;
+	user-select: none;
+	z-index: 3;
+	width: 100%;
+	height: 100%;
+}
+
+.moderation.auth-fail > .moder-key {
+	display: none !important;
+}
+
+.moderation:not(.authed) > .moder-data {
+	display: none;
+}
+
+.moderation:not(.authed) > .moder-key {
+	display: flex;
+}
+
+.moderation > .moder-fail {
+	display: none;
+}
+
+@keyframes mod-fadeout {
+	0% {
+		transform: translateX(100px);
+		opacity: 0;
+	}
+
+	100% {
+		transform: translateX(0);
+		opacity: 1;
+	}
+}
+
+@keyframes mod-fadein {
+	0% {
+		transform: translateX(0);
+		opacity: 1;
+	}
+
+	100% {
+		transform: translateX(-100px);
+		opacity: 0;
+	}
+}

@@ -147,8 +147,6 @@ app.use('/assets', express.static('../assets/'));
 app.use('/', express.static('../frontend/'));
 
 app.get('/api/find/:code', (req, res) => {
-	res.setHeader('content-type', 'application/json');
-
 	const {code} = req.params;
 
 	for (let i = 0; i < db.length; ++i) {
@@ -163,8 +161,6 @@ app.get('/api/find/:code', (req, res) => {
 });
 
 app.get('/api/game/:uid', (req, res) => {
-	res.setHeader('content-type', 'application/json');
-
 	const uid = parseInt(req.params.uid);
 	if (uid >= 0) {
 		const game = getGameByID(uid);
@@ -196,7 +192,6 @@ const isSomethingChanged = game => {
 };
 
 app.get('/api/ckey', (req, res) => {
-	res.setHeader('content-type', 'application/json');
 	const jres = {enabled: cfg.reCAPTCHA_enabled};
 	if (jres.enabled) jres.key = cfg.reCAPTCHA_site;
 	res.send(JSON.stringify(jres));
@@ -230,8 +225,17 @@ const suggestGameInfo = async (game, robj, ip) => {
 
 app.set('trust proxy', false);
 
-app.put('/api/db', jbodyparser, async (req, res) => {
-	res.setHeader('content-type', 'application/json');
+app.use((req, res, next) => {
+	if (req.url.indexOf('/api/') === 0)
+		res.setHeader('content-type', 'application/json');
+	next();
+});
+
+app.get('/api/checkmkey', (req, res) => {
+	res.send('{"valid": false}');
+});
+
+app.put('/api/db', jbodyparser, (req, res) => {
 	const robj = {success: false, message: ''};
 	const body = req.body;
 
@@ -282,8 +286,6 @@ app.put('/api/db', jbodyparser, async (req, res) => {
 });
 
 app.get('/api/db/:page', (req, res) => {
-	res.setHeader('content-type', 'application/json');
-
 	const pagen = parseInt(req.params.page);
 	const {filter, starts, bstat} = req.query;
 	const bstati = parseInt(bstat ?? 0xFFFFFFFF);
@@ -313,7 +315,7 @@ app.get('/api/db/:page', (req, res) => {
 					ustarts = null;
 					break;
 				case 'sym':
-					ustarts = /^[\x21-\x3C\x3F\x40]/;
+					ustarts = /^[\x21-\x2F\x3A-\x40]/;
 					break;
 				case 'num':
 					ustarts = /^[0-9]/;

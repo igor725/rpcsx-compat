@@ -9,6 +9,13 @@ Element.prototype.$$ = Element.prototype.querySelectorAll;
 import { open as openWindow } from './wloader.js';
 import { Request } from './request.js';
 
+export let reCAPTCHA_sitekey = 'NOTSET';
+
+export const makeItShake = target => {
+	target.classList.add('shake');
+	setTimeout(() => target.classList.remove('shake'), 255);
+}
+
 window.on('load', () => {
 	const info = {
 		statuses: ['Nothing', 'Loadable', 'Intro', 'Ingame', 'Playable'],
@@ -206,11 +213,15 @@ window.on('load', () => {
 
 	const htstitms = [];
 
-	htstitms.push('<div class="item" data-value=""><span>All</span></div>');
-	htstitms.push('<div class="item" data-value="num"><span>0-9</span></div>');
+	const stitcl = (val, tit = null) =>
+		`<div class="item in-center" data-value="${val}"><span>${tit ?? val}</span></div>`;
+
+	htstitms.push(stitcl('', 'All'));
+	htstitms.push(stitcl('num', '0-9'));
+
 	for (let i = 65; i < 91; ++i)
-		htstitms.push(`<div class="item" data-value="${String.fromCharCode(i)}"><span>${String.fromCharCode(i)}</span></div>`);
-	htstitms.push('<div class="item" data-value="sym"><span>#</span></div>');
+		htstitms.push(stitcl(String.fromCharCode(i)));
+	htstitms.push(stitcl('sym', '#'));
 
 	$('div.compat-starts').innerHTML = htstitms.join('');
 
@@ -242,10 +253,7 @@ window.on('load', () => {
 	$('div.compat-rbuttons').on('click', ({target}) => {
 		if (!target.classList.contains('compat-rbutton')) return;
 
-		openWindow(target.dataset.action).catch(err => {
-			target.classList.add('shake');
-			setTimeout(() => target.classList.remove('shake'), 255);
-		});
+		openWindow(target.dataset.action).catch(err => makeItShake(target));
 	});
 
 	window.on('hashchange', updateTable);
@@ -255,7 +263,7 @@ window.on('load', () => {
 		if (Request.success(status)) {
 			if (body.enabled === true) {
 				window.grecaptcha = false;
-				window._captcha_sitekey = body.key;
+				reCAPTCHA_sitekey = body.key;
 				const gcscr = document.createElement('script');
 				gcscr.src = 'https://www.google.com/recaptcha/api.js?render=' + body.key;
 				gcscr.async = 'async';

@@ -1,3 +1,4 @@
+import { reCAPTCHA_sitekey } from '../../js/main.js';
 import { Request } from '../../js/request.js';
 
 export const onload = load_id => {
@@ -158,7 +159,7 @@ export const onload = load_id => {
 					target.classList.remove('shake');
 					if (target.reportValidity())
 						finishEdit();
-				}, 405);
+				}, 255);
 			}, 100);
 
 			return false;
@@ -254,7 +255,7 @@ export const onload = load_id => {
 				target.classList.add('busy');
 				grecaptcha.ready(() => {
 					try {
-						grecaptcha.execute(window._captcha_sitekey, {action: 'submit'}).then(token => {
+						grecaptcha.execute(reCAPTCHA_sitekey, {action: 'submit'}).then(token => {
 							pushGameRequest(token);
 							target.classList.remove('busy');
 						});
