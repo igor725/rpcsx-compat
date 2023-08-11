@@ -1,6 +1,11 @@
 .win-root.moderation {
 	width: 40%;
 	height: 320px;
+	transition: height 250ms;
+}
+
+.win-root.moderation:not(.auth-fail):not(.authed) {
+	height: 100px;
 }
 
 .moder-key {
