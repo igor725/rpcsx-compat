@@ -16,15 +16,15 @@ export const onload = load_id => {
 	const regions = $('.editor-regions');
 	const mainregsel = $('.editor-regions > .editor-regrid > .editor-region > select');
 
-	const setOptions = (elem, opts) => {
+	const setOptions = (elem, opts, titles = null) => {
 		const htelems = [];
-		opts.forEach(name => htelems.push(`<option>${name}</option>`));
+		opts.forEach((name, id) => htelems.push(`<option title="${titles ? titles[id] : ''}">${name}</option>`));
 		elem.innerHTML = htelems.join('');
 	}
 
-	setOptions(pstat, infoBase.statuses);
-	setOptions(ptype, infoBase.types);
-	setOptions(gdistr, infoBase.distribs);
+	setOptions(pstat, infoBase.statuses, infoBase.stexpls);
+	setOptions(ptype, infoBase.types, infoBase.tyexpls);
+	setOptions(gdistr, infoBase.distribs, infoBase.diexpls);
 	setOptions(mainregsel, infoBase.regions);
 
 	const trect = titext.getBoundingClientRect();

@@ -10,7 +10,7 @@ export const makeItShake = target => {
 
 export const info = {
 	statuses: ['Nothing', 'Loadable', 'Intro', 'Ingame', 'Playable'],
-	expls: [
+	stexpls: [
 		'Games that don\'t initialize properly, not loading at all and/or crashing the emulator',
 		'Games that display a black screen',
 		'Games that display image but don\'t make it past the menus',
@@ -19,7 +19,17 @@ export const info = {
 	],
 	colors: ['#e74c3c', '#fa6800', '#e08a1e', '#f9b22f', '#1ebc61'],
 	types: ['Multiplatform', 'PlayStation™ exclusive', 'Console exclusive'],
+	tyexpls: [
+		'Games that available on platforms like PC, Android, iOS',
+		'Games that available only on PlayStation™ consoles',
+		'Games that available only on consoles',
+	],
 	distribs: ['Digital', 'Disk', 'Homebrew'],
+	diexpls: [
+		'Games that can be purchased on PlayStation™ Store',
+		'Games that can be purchased on physical Blu-Ray disk',
+		'Unofficial software that was not licensed by Sony'
+	],
 	regions: ['World', 'USA', 'EUR', 'JPN']
 };
 
@@ -75,7 +85,7 @@ window.on('load', () => {
 									<input type="checkbox" value="${1 << i}"${(ibstat & (1 << i)) > 0 ? ' checked' : ''}/>
 									<strong style="color: ${info.colors[i]}">${info.statuses[i]} (${((overall[i] / max) * 100).toFixed(2)}%)</strong>:
 								</div>
-								<div class="scrollable-text">${info.expls[i]}</div>
+								<div class="scrollable-text">${info.stexpls[i]}</div>
 							</div>
 						`);
 					}
