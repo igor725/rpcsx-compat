@@ -8,6 +8,15 @@
 		<link rel="stylesheet" href="css/colors.css">
 		<link rel="stylesheet" href="css/main.css">
 		<link rel="stylesheet" href="css/wloader.css">
+		<script>
+			// Why not?
+			window.on = window.addEventListener;
+			window.$ = qs => document.querySelector(qs);
+			window.$$ = qs => document.querySelectorAll(qs);
+			Element.prototype.on = Element.prototype.addEventListener;
+			Element.prototype.$ = Element.prototype.querySelector;
+			Element.prototype.$$ = Element.prototype.querySelectorAll;
+		</script>
 		<script src="js/main.js" type="module"></script>
 	</head>
 	<body>

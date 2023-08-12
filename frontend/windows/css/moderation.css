@@ -4,7 +4,7 @@
 	transition: height 250ms;
 }
 
-.win-root.moderation:not(.auth-fail):not(.authed) {
+.win-root.moderation:not(.moder-mesg):not(.authed) {
 	height: 100px;
 }
 
@@ -22,7 +22,7 @@
 	display: block;
 }
 
-.moderation.auth-fail > .moder-fail {
+.moderation.moder-mesg > .moder-text {
 	display: flex;
 	text-align: center;
 	user-select: none;
@@ -31,11 +31,12 @@
 	height: 100%;
 }
 
-.moderation.auth-fail > .moder-key {
+.moderation.moder-mesg > .moder-key {
 	display: none !important;
 }
 
-.moderation:not(.authed) > .moder-data {
+.moderation:not(.authed) > .moder-data,
+.moderation.moder-mesg > .moder-data {
 	display: none;
 }
 
@@ -43,7 +44,7 @@
 	display: flex;
 }
 
-.moderation > .moder-fail {
+.moderation > .moder-text {
 	display: none;
 }
 

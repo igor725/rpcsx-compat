@@ -1,5 +1,5 @@
 node_modules/
-/suggestions/*
-!/suggestions/.empty
+/suggestions.json
+/modkeys.json
 /cfg.json
 #/db.json

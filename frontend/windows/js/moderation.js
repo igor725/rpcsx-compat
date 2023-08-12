@@ -1,29 +1,105 @@
 import { makeItShake } from '../../js/main.js';
 import { Request } from '../../js/request.js';
 
+class ModRequest extends Request {
+	constructor(path, method, ekey) {
+		super(path, method);
+
+		const key = localStorage.getItem('mod-key') ?? ekey;
+		if (key) this.header('Mod-Key', key);
+	}
+};
+
 export const onload = wdata => {
-	const moder = $('.moderation');
+	const moder = $('.win-root.moderation');
 	const keyinp = $('.moder-key > input');
+	const infotext = $('.moder-text');
 
 	let animlock = false;
-	$('.moderation > .moder-fail').on('click', ({target}) => {
+	$('.moderation > .moder-text').on('click', ({target}) => {
 		if (animlock) return;
 		animlock = true;
 
+		let action = infotext.dataset.hideaction;
+		if (moder.classList.contains('auth-fail'))
+			action = 'relogin';
+
 		target.style.animation = 'mod-fadein 125ms forwards';
 		setTimeout(() => {
-			keyinp.style.animation = 'mod-fadeout 125ms forwards';
-			moder.classList.remove('auth-fail');
+			switch (action) {
+				case 'relogin':
+					keyinp.style.animation = 'mod-fadeout 125ms forwards';
+					break;
+			}
+			moder.classList.remove('moder-mesg');
 			setTimeout(() => {
-				keyinp.style.animation = null;
+				switch (action) {
+					case 'relogin':
+						keyinp.style.animation = null;
+						keyinp.focus();
+						break;
+					case 'rerequest':
+						loadList();
+						break;
+				}
 				target.style.animation = null;
 				animlock = false;
-				keyinp.focus();
 			}, 125);
 		}, 125);
 	});
 
 	let entertimer = null;
+
+	const setValidKey = (key) => {
+		localStorage.setItem('mod-key', key);
+		moder.classList.remove('moder-mesg');
+		moder.classList.add('authed');
+	};
+
+	const showModMesg = (text, cact = null) => {
+		moder.classList.add('moder-mesg');
+		infotext.dataset.hideaction = cact;
+		infotext.innerHTML = text;
+	};
+
+	const removeModKey = () => {
+		if (localStorage.getItem('mod-key')) {
+			showModMesg('Your moderation key is not valid anymore.<br>Click here to enter a new one.');
+			localStorage.removeItem('mod-key');
+			moder.classList.add('auth-fail');
+			moder.classList.remove('authed');
+			keyinp.value = '';
+		}
+	};
+
+	const emptyList = () => {
+		showModMesg(
+			'There are no unapproved changes at the moment. Try again later<br>Click here to reload the list.',
+			'rerequest'
+		);
+	};
+
+	const loadList = () => {
+		(new ModRequest('/api/unapproved')).callback((status, body) => {
+			if (!Request.success(status)) {
+				showModMesg('Request to the server failed', 'rerequest');
+				return;
+			}
+
+			if (body.success === false) {
+				showModMesg(body.message, 'rerequest');
+				return;
+			}
+
+			const items = body.items;
+			if (items.length > 0) {
+
+				return;
+			}
+
+			emptyList();
+		}).perform();
+	};
 
 	const testModKey = () => {
 		clearTimeout(entertimer);
@@ -32,20 +108,25 @@ export const onload = wdata => {
 		const text = keyinp.value;
 		if (text.length < 24) {
 			makeItShake(keyinp);
+			removeModKey();
 			return;
 		}
 
 		if (keyinp.reportValidity()) {
-			(new Request(`/api/checkmkey?k=${encodeURIComponent(text)}`)).callback((status, body) => {
-				if (!Request.success(status)) {
+			(new ModRequest('/api/checkmkey', 'get', encodeURIComponent(keyinp.value))).callback((status, body) => {
+				if (!ModRequest.success(status)) {
 					alert(`Unexpected checkmkey request error: ${status}\nPlease try again later.`);
 					return;
 				}
 
 				if (body.valid !== true) {
 					makeItShake(keyinp);
+					removeModKey();
 					return;
 				}
+
+				setValidKey(text);
+				loadList();
 			}).perform();
 		}
 	};
@@ -67,4 +148,8 @@ export const onload = wdata => {
 		if (code === 'Enter')
 			testModKey();
 	});
+
+	keyinp.value = localStorage.getItem('mod-key');
+	if (keyinp.value !== '') testModKey();
+	keyinp.focus();
 };

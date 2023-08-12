@@ -1,5 +1,18 @@
 import { Request } from './request.js';
 
+let focused = true;
+let foctmo = null;
+
+window.on('focus', ev => {
+	foctmo = setTimeout(() => focused = true, 250);
+});
+
+window.on('blur', ev => {
+	if (foctmo) clearTimeout(foctmo);
+	focused = false;
+	foctmo = null;
+});
+
 const genHTML = (wname, wdata) => {
 	(new Request(`/windows/${wname}.html`)).callback((status, body) => {
 		if (!Request.success(status)) {
@@ -16,7 +29,7 @@ const genHTML = (wname, wdata) => {
 		shadow.innerHTML = body;
 
 		shadow.addEventListener('click', ({target}) => {
-			if (shadow.classList.contains('close')) return;
+			if (shadow.classList.contains('close') || !focused) return;
 			if (target === shadow || target.classList.contains('btn-close')) {
 				base.classList.add('close');
 				shadow.classList.add('close');

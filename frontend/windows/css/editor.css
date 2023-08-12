@@ -6,16 +6,16 @@
 	grid-template-rows: 40px 1fr 50px;
 }
 
-.win-root.editor:not(.expanded) {
-	width: 20%;
-	height: 100px;
-}
-
 .editor-data {
 	display: flex;
 	flex-direction: column;
 	width: 80%;
 	height: 100%;
+}
+
+.win-root.editor:not(.expanded) {
+	width: 20%;
+	height: 100px;
 }
 
 .win-root:not(.expanded).editor .editor-data {

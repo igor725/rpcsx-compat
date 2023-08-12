@@ -1,14 +1,18 @@
 export class Request {
 	#_xhr; #_cb;
 
-	constructor(request, method = 'get') {
+	constructor(path, method = 'get') {
 		const xhr = this.#_xhr = new XMLHttpRequest();
-		if (request.indexOf('/api/') === 0)
+		if (path.indexOf('/api/') === 0)
 			xhr.responseType = 'json';
 		xhr.onreadystatechange = () => this.#_loaded();
-		xhr.open(method, request);
+		xhr.open(method, path);
 		this.#_cb = null;
 	}
+
+	header = (name, value) => {
+		this.#_xhr.setRequestHeader(name, value);
+	};
 
 	callback = (func) => {
 		this.#_cb = func;
