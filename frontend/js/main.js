@@ -71,7 +71,7 @@ window.on('load', () => {
 					for (let i = overall.length - 1; i >= 0; --i) {
 						htoverall.push(`
 							<div class="compat-status-line">
-								<div class="status-title">
+								<div class="status-title center">
 									<input type="checkbox" value="${1 << i}"${(ibstat & (1 << i)) > 0 ? ' checked' : ''}/>
 									<strong style="color: ${info.colors[i]}">${info.statuses[i]} (${((overall[i] / max) * 100).toFixed(2)}%)</strong>:
 								</div>

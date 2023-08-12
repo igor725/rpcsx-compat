@@ -157,8 +157,9 @@ h2.compat-title {
 }
 
 .compat-status-line input {
-	margin-top: 0;
+	margin-top: -3px;
 	margin-bottom: 0;
+	margin-right: 5px;
 }
 
 .compat-search {
