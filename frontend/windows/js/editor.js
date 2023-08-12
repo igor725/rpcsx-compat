@@ -1,4 +1,4 @@
-import { reCAPTCHA_sitekey } from '../../js/main.js';
+import { reCAPTCHA_sitekey, info as infoBase } from '../../js/main.js';
 import { Request } from '../../js/request.js';
 
 export const onload = load_id => {
@@ -14,6 +14,18 @@ export const onload = load_id => {
 	const gcomment = $('.editor-data > .game-comment');
 	const esubresult = $('.editor-data > .editor-subresult');
 	const regions = $('.editor-regions');
+	const mainregsel = $('.editor-regions > .editor-regrid > .editor-region > select');
+
+	const setOptions = (elem, opts) => {
+		const htelems = [];
+		opts.forEach(name => htelems.push(`<option>${name}</option>`));
+		elem.innerHTML = htelems.join('');
+	}
+
+	setOptions(pstat, infoBase.statuses);
+	setOptions(ptype, infoBase.types);
+	setOptions(gdistr, infoBase.distribs);
+	setOptions(mainregsel, infoBase.regions);
 
 	const trect = titext.getBoundingClientRect();
 	tinput.style.width = `${trect.width + 6}px`;

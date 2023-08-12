@@ -8,22 +8,22 @@ export const makeItShake = target => {
 	setTimeout(() => target.classList.remove('shake'), 255);
 }
 
-window.on('load', () => {
-	const info = {
-		statuses: ['Nothing', 'Loadable', 'Intro', 'Ingame', 'Playable'],
-		expls: [
-			'Games that don\'t initialize properly, not loading at all and/or crashing the emulator',
-			'Games that display a black screen',
-			'Games that display image but don\'t make it past the menus',
-			'Games that either can\'t be finished, have serious glitches or have insufficient performance',
-			'Games that can be completed with playable performance and no game breaking glitches'
-		],
-		colors: ['#e74c3c', '#fa6800', '#e08a1e', '#f9b22f', '#1ebc61'],
-		types: ['Multiplatform', 'PlayStation™ exclusive', 'Console exclusive'],
-		distribs: ['DIGIT', 'DISK', 'HBREW'],
-		regions: ['WOR', 'USA', 'EUR', 'JPN']
-	};
+export const info = {
+	statuses: ['Nothing', 'Loadable', 'Intro', 'Ingame', 'Playable'],
+	expls: [
+		'Games that don\'t initialize properly, not loading at all and/or crashing the emulator',
+		'Games that display a black screen',
+		'Games that display image but don\'t make it past the menus',
+		'Games that either can\'t be finished, have serious glitches or have insufficient performance',
+		'Games that can be completed with playable performance and no game breaking glitches'
+	],
+	colors: ['#e74c3c', '#fa6800', '#e08a1e', '#f9b22f', '#1ebc61'],
+	types: ['Multiplatform', 'PlayStation™ exclusive', 'Console exclusive'],
+	distribs: ['Digital', 'Disk', 'Homebrew'],
+	regions: ['World', 'USA', 'EUR', 'JPN']
+};
 
+window.on('load', () => {
 	const getHashParamInt = (param) => {
 		const params = new URLSearchParams(location.hash.substring(1));
 		return parseInt(params.get(param) ?? 0);
