@@ -26,6 +26,7 @@
 	pointer-events: all;
 	background-color: var(--window);
 	transition: height 250ms, width 250ms;
+	overflow-x: hidden;
 }
 
 .win-root.close {

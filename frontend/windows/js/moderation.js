@@ -74,7 +74,7 @@ export const onload = wdata => {
 
 	const emptyList = () => {
 		showModMesg(
-			'There are no unapproved changes at the moment. Try again later<br>Click here to reload the list.',
+			'There are no unapproved changes at the moment. Try again later.<br>Click here to reload the list.',
 			'rerequest'
 		);
 	};
@@ -82,12 +82,12 @@ export const onload = wdata => {
 	const loadList = () => {
 		(new ModRequest('/api/unapproved')).callback((status, body) => {
 			if (!Request.success(status)) {
-				showModMesg('Request to the server failed', 'rerequest');
+				showModMesg('Request to the server failed.<br>Click here to try again.', 'rerequest');
 				return;
 			}
 
 			if (body.success === false) {
-				showModMesg(body.message, 'rerequest');
+				showModMesg(body.message + '<br>Click here to try again.', 'rerequest');
 				return;
 			}
 

@@ -202,12 +202,14 @@ export const onload = load_id => {
 		const regridregs = regrid.$$('.editor-region');
 		const nextregrid = regrid.nextElementSibling;
 
-		if (nextregion === null && regridregs.length === 1) {
-			regrid.appendChild(cloneRegion(region));
-		} else if (nextregrid === null && nextregion === null) {
-			const newregrid = regrid.cloneNode();
-			newregrid.appendChild(cloneRegion(region));
-			regions.appendChild(newregrid);
+		if (target.value.length > 0 && regions.$$('.editor-region').length < infoBase.regions.length) {
+			if (nextregion === null && regridregs.length === 1) {
+				regrid.appendChild(cloneRegion(region));
+			} else if (nextregrid === null && nextregion === null) {
+				const newregrid = regrid.cloneNode();
+				newregrid.appendChild(cloneRegion(region));
+				regions.appendChild(newregrid);
+			}
 		} else if (target.value === '') {
 			if (regridregs.length === 2) {
 				const regridnextinput = regridregs[1].$('input');
