@@ -19,7 +19,7 @@ jvalid.addSchema({
 	properties: {
 		uid: {
 			type: 'integer',
-			minimum: -1,
+			minimum: 0,
 			required: true
 		},
 		ids: {
@@ -309,8 +309,8 @@ app.get('/api/ckey', (req, res) => {
 	res.send(JSON.stringify(jres));
 });
 
-const suggestGameInfo = async (game, robj, ip) => {
-	const result = jvalid.validate(game, {$ref: '/DBEntry'});
+const suggestGameInfo = (game, robj, ip) => {
+	const result = jvalid.validate(game, {$ref: '/SUEntry'});
 	if (result.valid === true) {
 		if (!isSomethingChanged(game)) {
 			robj.success = false;
