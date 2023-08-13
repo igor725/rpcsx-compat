@@ -17,11 +17,6 @@ const htmlDetection = {
 jvalid.addSchema({
 	type: 'object',
 	properties: {
-		uid: {
-			type: 'integer',
-			minimum: 0,
-			required: true
-		},
 		ids: {
 			type: 'array',
 			required: true,
@@ -205,27 +200,14 @@ const mk = openJVALID('../modkeys.json', mkschema);
 const sudb = openJVALID('../suggestions.json', suschema);
 const maxItemsPerPage = 20;
 const overall = [];
-let latestUID = -1;
 let sudbAltered = false;
 let dbAltered = false;
-
-const getGameByID = id => {
-	if (id < 0) return null;
-
-	for (let i = 0; i < db.length; ++i) {
-		if (db[i].uid === id)
-			return db[i];
-	}
-
-	return null;
-};
 
 const updateDB = () => {
 	for (let i = 0; i < 5; ++i) overall[i] = 0;
 
 	db.forEach(item => {
 		++overall[item.status];
-		latestUID = Math.max(latestUID, item.uid);
 	});
 
 	db.sort((a, b) => b.status - a.status);
@@ -265,8 +247,8 @@ app.get('/api/find/:code', (req, res) => {
 app.get('/api/game/:uid', (req, res) => {
 	const uid = parseInt(req.params.uid);
 	if (uid >= 0) {
-		const game = getGameByID(uid);
-		if (game !== null) {
+		const game = db[uid];
+		if (game !== undefined) {
 			res.send(JSON.stringify({success: true, game: game}));
 			return;
 		}
@@ -281,7 +263,10 @@ const compareArrays = (a, b) =>
 
 const isSomethingChanged = game => {
 	if (game.uid < 0) return true;
-	const ogame = getGameByID(game.uid);
+	const ogame = db[game.uid];
+	if (ogame === undefined)
+		throw new Error('Invalid game ID');
+
 	const changes = {
 		title: game.title !== ogame.title,
 		type: game.type !== ogame.type,
@@ -311,21 +296,26 @@ app.get('/api/ckey', (req, res) => {
 
 const suggestGameInfo = (game, robj, ip) => {
 	const result = jvalid.validate(game, {$ref: '/SUEntry'});
-	if (result.valid === true) {
-		if (!isSomethingChanged(game)) {
-			robj.success = false;
-			robj.message = 'Nothing changed! Your suggestion was rejected.';
-		} else {
-			game.suggested_by = Buffer.from(ip).toString('base64');
-			game.updated = Date.now();
-			sudb.push(game);
+	try {
+		if (result.valid === true) {
+			if (!isSomethingChanged(game)) {
+				robj.success = false;
+				robj.message = 'Nothing changed! Your suggestion was rejected.';
+			} else {
+				game.suggested_by = Buffer.from(ip).toString('base64');
+				game.updated = Date.now();
+				sudb.push(game);
 
-			robj.success = true;
-			robj.message = 'Suggestion submitted, thank you!';
+				robj.success = true;
+				robj.message = 'Suggestion submitted, thank you!';
+			}
+		} else {
+			robj.success = false;
+			robj.message = result.errors[0].toString();
 		}
-	} else {
+	} catch (e) {
 		robj.success = false;
-		robj.message = result.errors[0].toString();
+		robj.message = e.toString();
 	}
 };
 
@@ -336,14 +326,19 @@ app.get('/api/checkmkey', ({headers}, res) => {
 	res.send(`{"valid": ${testKey(headers['mod-key'])}}`);
 });
 
+const createDObject = item => {
+	const nobj = {_current: db[item.uid]};
+	return Object.assign(nobj, item);
+};
+
 app.get('/api/unapproved', ({headers}, res) => {
 	const robj = {success: false};
 
 	if (testKey(headers['mod-key'])) {
 		robj.success = true;
 		const items = robj.items = [];
-		for (let i = 0; i < sudb.length && i < 100; ++i)
-			items.push(sudb[i]);
+		for (let i = 0; i < sudb.length && i < maxItemsPerPage; ++i)
+			items.push(createDObject(sudb[i]));
 	} else {
 		robj.success = false;
 		robj.message = 'Authentication failed';
@@ -402,6 +397,12 @@ app.put('/api/db', jbodyparser, (req, res) => {
 	greq.end();
 });
 
+const getGameJSON = i => {
+	const game = Object.assign({}, db[i]);
+	game.uid = i;
+	return JSON.stringify(game);
+};
+
 app.get('/api/db/:page', (req, res) => {
 	const pagen = parseInt(req.params.page);
 	const {filter, starts, bstat} = req.query;
@@ -417,7 +418,7 @@ app.get('/api/db/:page', (req, res) => {
 			res.write(`"pages": ${Math.ceil(dbsize / maxItemsPerPage)}, "items": [`);
 			for (let i = start; i < end; ++i) {
 				if (i > start) res.write(', ');
-				res.write(JSON.stringify(db[i]));
+				res.write(getGameJSON(i));
 			}
 			res.end(']}');
 		} else {
@@ -450,7 +451,7 @@ app.get('/api/db/:page', (req, res) => {
 					(ufilter ? utitle.indexOf(ufilter) !== -1 || db[i].ids.findIndex(id => id.indexOf(ufilter) !== -1) !== -1 : true)
 				) {
 					if (found++ < start || items.length >= maxItemsPerPage) continue;
-					items.push(JSON.stringify(db[i]));
+					items.push(getGameJSON(i));
 				}
 			}
 

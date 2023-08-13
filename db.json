@@ -1,6 +1,5 @@
 [
 	{
-		"uid": 0,
 		"ids": ["CUSA02394"],
 		"regions": [2],
 		"title": "We Are Doomed",
@@ -12,7 +11,6 @@
 		"rpcsx": "8a5eb8e5"
 	},
 	{
-		"uid": 1,
 		"ids": ["CUSA07010"],
 		"regions": [2],
 		"title": "Sonic Mania",
@@ -24,7 +22,6 @@
 		"rpcsx": "8a5eb8e5"
 	},
 	{
-		"uid": 2,
 		"ids": ["CUSA06840"],
 		"regions": [2],
 		"title": "Stardew Valley",
@@ -36,7 +33,6 @@
 		"rpcsx": "8a5eb8e5"
 	},
 	{
-		"uid": 3,
 		"ids": ["CUSA03173"],
 		"regions": [2],
 		"title": "Bloodborne",
@@ -48,7 +44,6 @@
 		"rpcsx": "8a5eb8e5"
 	},
 	{
-		"uid": 4,
 		"ids": ["CUSA04022"],
 		"regions": [2],
 		"title": "Worms W.M.D",
@@ -60,7 +55,6 @@
 		"rpcsx": "8a5eb8e5"
 	},
 	{
-		"uid": 5,
 		"ids": ["CUSA06093"],
 		"regions": [2],
 		"title": "Project Diva Future Tone",
@@ -72,7 +66,6 @@
 		"rpcsx": "8a5eb8e5"
 	},
 	{
-		"uid": 6,
 		"ids": ["CUSA00242"],
 		"regions": [2],
 		"title": "Diablo III Reaper of Souls",
@@ -84,7 +77,6 @@
 		"rpcsx": "8a5eb8e5"
 	},
 	{
-		"uid": 7,
 		"ids": ["CUSA01127"],
 		"regions": [2],
 		"title": "P.T",
@@ -96,7 +88,6 @@
 		"rpcsx": "8a5eb8e5"
 	},
 	{
-		"uid": 8,
 		"ids": ["CUSA15250"],
 		"regions": [2],
 		"title": "Deltarune Chapter 1",
@@ -108,7 +99,6 @@
 		"rpcsx": "8a5eb8e5"
 	},
 	{
-		"uid": 9,
 		"ids": ["CUSA06921"],
 		"regions": [2],
 		"title": "BLACKHOLE: Complete Edition",
@@ -120,7 +110,6 @@
 		"rpcsx": "8a5eb8e5"
 	},
 	{
-		"uid": 10,
 		"ids": ["CUSA03323"],
 		"regions": [2],
 		"title": "Uncanny Valley",
@@ -132,7 +121,6 @@
 		"rpcsx": "8a5eb8e5"
 	},
 	{
-		"uid": 11,
 		"ids": ["CUSA14656"],
 		"regions": [2],
 		"title": "Blazing Chrome",
@@ -144,7 +132,6 @@
 		"rpcsx": "8a5eb8e5"
 	},
 	{
-		"uid": 12,
 		"ids": ["CUSA06277"],
 		"regions": [2],
 		"title": "A Bastard's Tale",
@@ -156,7 +143,6 @@
 		"rpcsx": "8a5eb8e5"
 	},
 	{
-		"uid": 13,
 		"ids": ["CUSA05012"],
 		"regions": [2],
 		"title": "Bard's Gold",
@@ -168,7 +154,6 @@
 		"rpcsx": "8a5eb8e5"
 	},
 	{
-		"uid": 14,
 		"ids": ["CUSA02600"],
 		"regions": [2],
 		"title": "Shutshimi",
@@ -180,7 +165,6 @@
 		"rpcsx": "8a5eb8e5"
 	},
 	{
-		"uid": 15,
 		"ids": ["CUSA03292"],
 		"regions": [2],
 		"title": "Super Star Wars",
@@ -192,7 +176,6 @@
 		"rpcsx": "8a5eb8e5"
 	},
 	{
-		"uid": 16,
 		"ids": ["CUSA30992"],
 		"regions": [2],
 		"title": "T.M.N.T Shredder's Revenge",
@@ -204,7 +187,6 @@
 		"rpcsx": "8a5eb8e5"
 	},
 	{
-		"uid": 17,
 		"ids": ["CUSA05051"],
 		"regions": [2],
 		"title": "Oxenfree",
@@ -216,7 +198,6 @@
 		"rpcsx": "8a5eb8e5"
 	},
 	{
-		"uid": 18,
 		"ids": ["CUSA04692"],
 		"regions": [2],
 		"title": "10 Second Ninja X",
@@ -228,7 +209,6 @@
 		"rpcsx": "8a5eb8e5"
 	},
 	{
-		"uid": 19,
 		"ids": ["CUSA07773"],
 		"regions": [2],
 		"title": "Cursed Castilla Maldita EX",
@@ -240,7 +220,6 @@
 		"rpcsx": "8a5eb8e5"
 	},
 	{
-		"uid": 20,
 		"ids": ["CUSA01623"],
 		"regions": [2],
 		"title": "God of War 3 Remastered",
@@ -252,7 +231,6 @@
 		"rpcsx": "8a5eb8e5"
 	},
 	{
-		"uid": 21,
 		"ids": ["CUSA02344"],
 		"regions": [2],
 		"title": "Uncharted Nathan Drake Collection",
@@ -264,7 +242,6 @@
 		"rpcsx": "8a5eb8e5"
 	},
 	{
-		"uid": 22,
 		"ids": ["CUSA00897"],
 		"regions": [2],
 		"title": "Infamous First Light",
@@ -276,7 +253,6 @@
 		"rpcsx": "8a5eb8e5"
 	},
 	{
-		"uid": 23,
 		"ids": ["CUSA08809"],
 		"regions": [2],
 		"title": "Shadow of the Colossus",
@@ -288,7 +264,6 @@
 		"rpcsx": "8a5eb8e5"
 	},
 	{
-		"uid": 24,
 		"ids": ["CUSA00231"],
 		"regions": [2],
 		"title": "Helldivers",
@@ -300,7 +275,6 @@
 		"rpcsx": "8a5eb8e5"
 	},
 	{
-		"uid": 25,
 		"ids": ["CUSA02282"],
 		"regions": [2],
 		"title": "Okage Shadow King",
@@ -312,7 +286,6 @@
 		"rpcsx": "8a5eb8e5"
 	},
 	{
-		"uid": 26,
 		"ids": ["CUSA08519", "CUSA03041", "CUSA08568"],
 		"regions": [2, 1, 3],
 		"title": "Red Dead Redemption 2",
@@ -324,7 +297,6 @@
 		"rpcsx": "8a5eb8e5"
 	},
 	{
-		"uid": 27,
 		"ids": ["CUSA18061", "CUSA18038", "CUSA18135"],
 		"regions": [2, 1, 3],
 		"title": "The Last of Us Part II",
@@ -336,7 +308,6 @@
 		"rpcsx": "8a5eb8e5"
 	},
 	{
-		"uid": 28,
 		"ids": ["CUSA09421"],
 		"regions": [2],
 		"title": "Sky Force Reloaded",
@@ -348,7 +319,6 @@
 		"rpcsx": "6441b7b1"
 	},
 	{
-		"uid": 29,
 		"ids": ["CUSA03633"],
 		"regions": [2],
 		"title": "Jetpack Joyride",
@@ -360,7 +330,6 @@
 		"rpcsx": "ebcd57d3"
 	},
 	{
-		"uid": 30,
 		"ids": ["SPLK00001"],
 		"regions": [0],
 		"title": "Spelunky HD",
@@ -372,7 +341,6 @@
 		"rpcsx": "ebcd57d3"
 	},
 	{
-		"uid": 31,
 		"ids": ["LAPY10009"],
 		"regions": [0],
 		"title": "Wild Gunman Remake",
@@ -384,7 +352,6 @@
 		"rpcsx": "ebcd57d3"
 	},
 	{
-		"uid": 32,
 		"ids": ["SMSR00001"],
 		"regions": [0],
 		"title": "Sonic SMS Remake",
