@@ -61,7 +61,7 @@ export const onload = load_id => {
 			game.regions[i] = region.$('select').selectedIndex;
 		}
 
-		(new Request('/api/db', 'put')).callback((status, body) => {
+		(new Request('/api/suggestion', 'put')).callback((status, body) => {
 			if (!Request.success(status)) {
 				showStatus(false, `Request failed with code ${status}`);
 				return;

@@ -234,9 +234,10 @@ app.use((req, res, next) => {
 app.get('/api/find/:code', (req, res) => {
 	const {code} = req.params;
 
-	for (let item of db) {
+	for (let i = 0; i < db.length; ++i) {
+		const item = db[i];
 		if (item.ids.findIndex(id => id === code) !== -1) {
-			res.send(JSON.stringify({success: true, game: item}));
+			res.send(JSON.stringify({success: true, game: Object.assign({uid: i}, item)}));
 			return;
 		}
 	}
@@ -304,9 +305,11 @@ const suggestGameInfo = (game, robj, ip) => {
 			} else {
 				game.suggested_by = Buffer.from(ip).toString('base64');
 				game.updated = Date.now();
+				game.suid = sudb.length;
 				sudb.push(game);
 
 				robj.success = true;
+				robj.suid = game.suid;
 				robj.message = 'Suggestion submitted, thank you!';
 			}
 		} else {
@@ -319,35 +322,57 @@ const suggestGameInfo = (game, robj, ip) => {
 	}
 };
 
-const testKey = key =>
+const testModKey = key =>
 	mk.findIndex(val => val === key) !== -1;
 
 app.get('/api/checkmkey', ({headers}, res) => {
-	res.send(`{"valid": ${testKey(headers['mod-key'])}}`);
+	res.send(`{"valid": ${testModKey(headers['mod-key'])}}`);
 });
 
-const createDObject = item => {
-	const nobj = {_current: db[item.uid]};
-	return Object.assign(nobj, item);
+const validateMod = (key, robj) => {
+	if (!testModKey(key)) {
+		robj.success = false;
+		robj.message = 'Authentication failed';
+		return false;
+	}
+
+	return true;
 };
 
 app.get('/api/unapproved', ({headers}, res) => {
 	const robj = {success: false};
 
-	if (testKey(headers['mod-key'])) {
+	if (validateMod(headers['mod-key'], robj)) {
 		robj.success = true;
 		const items = robj.items = [];
-		for (let i = 0; i < sudb.length && i < maxItemsPerPage; ++i)
-			items.push(createDObject(sudb[i]));
-	} else {
-		robj.success = false;
-		robj.message = 'Authentication failed';
+		for (let i = 0; i < sudb.length && i < maxItemsPerPage; ++i) {
+			const item = sudb[i];
+			items.push(Object.assign({_current: db[item.uid]}, item));
+		}
 	}
 
 	res.send(JSON.stringify(robj));
 });
 
-app.put('/api/db', jbodyparser, (req, res) => {
+app.put('/api/approval', jbodyparser, ({headers, body}, res) => {
+	const robj = {success: false};
+
+	if (validateMod(headers['mod-key'], robj)) {
+		for (let item of sudb) {
+			if (body.suid === item.suid) {
+				robj.success = true;
+				break;
+			}
+		}
+
+		if (robj.success === false)
+			robj.message = 'No such suggestion';
+	}
+
+	res.send(JSON.stringify(robj));
+});
+
+app.put('/api/suggestion', jbodyparser, (req, res) => {
 	const robj = {success: false, message: ''};
 	const body = req.body;
 
@@ -397,11 +422,8 @@ app.put('/api/db', jbodyparser, (req, res) => {
 	greq.end();
 });
 
-const getGameJSON = i => {
-	const game = Object.assign({}, db[i]);
-	game.uid = i;
-	return JSON.stringify(game);
-};
+const getGameJSON = i =>
+	JSON.stringify(Object.assign({uid: i}, db[i]));
 
 app.get('/api/db/:page', (req, res) => {
 	const pagen = parseInt(req.params.page);

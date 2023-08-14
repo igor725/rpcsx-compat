@@ -203,33 +203,43 @@ h2.compat-title {
 	background-color: var(--startwith-item-hover-bg);
 }
 
-.compat-table {
+.table {
+	display: flex;
+	flex-wrap: wrap;
 	width: 100%;
-	display: block;
 	height: fit-content;
 	user-select: none;
-	border: 2px var(--table-border) solid;
 	border-radius: 5px;
 }
 
-.compat-trow {
-	display: grid;
-	border-bottom: 2px var(--table-border) solid;
-	grid-template-columns: 7.5em 1fr 7em 5em;
+.table-body {
+	width: 100%;
 }
 
-.compat-trow:not(.extrainfo) {
+.table-row {
+	display: grid;
+	width: 100%;
+	border-bottom: 2px var(--table-border) solid;
+}
+
+.compat-trow {
+	grid-template-columns: 7.6em 1fr 6em 6em;
+}
+
+.table-row:not(.extrainfo) {
 	cursor: pointer;
 }
 
-.compat-trow.last-row:not(.expanded) {
-	border-bottom: none;
+.table-cell {
+	overflow: hidden;
+	border-color: var(--table-border);
+	border-width: 2px;
+	border-left-style: solid;
+	padding: 5px;
 }
 
-.compat-tcell {
-	overflow: hidden;
-	border-left: 2px var(--table-border) solid;
-	padding: 5px;
+.table-cell:last-child {
+	border-right-style: solid;
 }
 
 .compat-tcell.spanned {
@@ -255,19 +265,15 @@ span.game-title {
 	padding-left: 5px;
 }
 
-.compat-tcell.first {
-	border-left: none;
-}
-
-.compat-tbody .compat-trow:hover:not(.extrainfo) {
+.table-body .table-row:hover:not(.extrainfo) {
 	background-color: var(--table-row-hover-bg);
 }
 
-.compat-thead {
+.table-head {
 	background-color: var(--table-border);
 }
 
-.compat-thead .compat-tcell {
+.table-head .table-cell {
 	cursor: default;
 	color: var(--table-header-text);
 }
@@ -288,24 +294,24 @@ span.game-title {
 	vertical-align: middle;
 }
 
-.compat-trow.extrainfo {
+.table-row.extrainfo {
 	display: none;
 	overflow: auto;
 	max-height: 0;
 }
 
-.compat-trow .compat-edit-this {
+.table-row .compat-edit-this {
 	position: relative;
 	top: 0;
 	right: 1;
 }
 
-.compat-trow.extrainfo.open {
+.table-row.extrainfo.open {
 	display: block;
 	animation: open-extrainfo 250ms ease-in forwards;
 }
 
-.compat-trow.extrainfo.close {
+.table-row.extrainfo.close {
 	display: block;
 	animation: close-extrainfo 250ms ease-out forwards;
 }

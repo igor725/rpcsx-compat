@@ -60,7 +60,7 @@ window.on('load', () => {
 		const url = '/api/db/' + cpage + (query.length > 0 ? '?' + query.join('&') : '');
 		(new Request(url)).callback((status, body) => {
 			if (!Request.success(status)) {
-				$('div.compat-tbody').innerHTML = '<div class="compat-trow reset"><div class="compat-tcell spanned">Server request failed. Please, try refreshing the page in 5 minutes.</div></div>';
+				$('.compat-table .table-body').innerHTML = '<div class="table-row compat-trow reset"><div class="table-cell compat-tcell spanned">Server request failed. Please, try refreshing the page in 5 minutes.</div></div>';
 				$('div.compat-pages').innerHTML = '';
 				return;
 			}
@@ -98,7 +98,6 @@ window.on('load', () => {
 						const item = items[i];
 						const ids = item.ids;
 						const regions = item.regions;
-						const lr = i === (items.length - 1) ? ' last-row' : '';
 						const hids = [];
 
 						for (let j = 0; j < ids.length; j++) {
@@ -109,17 +108,17 @@ window.on('load', () => {
 						}
 
 						ht_items.push(`
-							<div class="compat-trow${lr}" data-id="${item.uid}">
-								<div class="compat-tcell first">${hids.join('<br>')}</div>
-								<div class="compat-tcell">
+							<div class="table-row compat-trow" data-id="${item.uid}">
+								<div class="table-cell compat-tcell">${hids.join('<br>')}</div>
+								<div class="table-cell compat-tcell">
 									<img class="compat-distr" src="/assets/${info.distribs[item.distr]}.png"/>
 									<span class="game-title">${item.title}</span>
 								</div>
-								<div class="compat-tcell" style="color: ${info.colors[item.status]}">${info.statuses[item.status]}</div>
-								<div class="compat-tcell">${(new Date(item.updated).toLocaleDateString())}</div>
+								<div class="table-cell compat-tcell" style="color: ${info.colors[item.status]}">${info.statuses[item.status]}</div>
+								<div class="table-cell compat-tcell">${(new Date(item.updated).toLocaleDateString())}</div>
 							</div>
-							<div class="compat-trow extrainfo${lr}">
-								<div class="compat-tcell first">
+							<div class="table-row extrainfo">
+								<div class="table-cell compat-tcell">
 									Game type: ${info.types[item.type]}<br/>
 									Tested on: <a href="https://github.com/RPCSX/rpcsx/commit/${item.rpcsx}" target="_blank">${item.rpcsx}</a>
 									${item.comment !== '' ? '<br>Comment: ' + item.comment.replace('<[^>]*>', '') : ''}<br>
@@ -128,7 +127,7 @@ window.on('load', () => {
 							</div>
 						`);
 					}
-					$('div.compat-table .compat-tbody').innerHTML = ht_items.join('');
+					$('div.compat-table .table-body').innerHTML = ht_items.join('');
 
 					if (pages < 2) {
 						// Only one page available atm
@@ -156,15 +155,6 @@ window.on('load', () => {
 		}).perform();
 	};
 
-	const getNextRowAfter = (row) => {
-		do {
-			row = row.nextElementSibling;
-			if (row === null) break;
-		} while (row.classList.contains('.compat-trow'));
-
-		return row;
-	};
-
 	const closeInfo = info => {
 		if (info === null) return;
 		info.classList.remove('open');
@@ -172,7 +162,7 @@ window.on('load', () => {
 		setTimeout(() => info.classList.remove('close'), 255);
 	};
 
-	$('div.compat-table .compat-tbody').on('click', ({target}) => {
+	$('div.compat-table > .table-body').on('click', ({target}) => {
 		const pnode = target.parentNode;
 		if (pnode.classList.contains('compat-serial')) {
 			const a = document.createElement('a');
@@ -187,27 +177,24 @@ window.on('load', () => {
 			return;
 		}
 
-		const tnode = target.classList.contains('.compat-trow') ? target : target.closest('div.compat-trow');
+		const trow = target.classList.contains('.table-row') ? trow : target.closest('.table-row');
 
-		if (tnode.classList.contains('extrainfo')) {
+		if (!trow || trow.classList.contains('extrainfo')) {
 			return;
-		} else if (tnode.classList.contains('reset')) {
+		} else if (trow.classList.contains('reset')) {
 			updateTable();
 			return;
 		}
 
-		const info = getNextRowAfter(tnode);
+		const info = trow.nextElementSibling;
 		if (info === null) return;
 
-		if (tnode.classList.toggle('expanded')) {
-			$$('.compat-trow.expanded').forEach(elem => {
-				if (elem !== tnode) {
-					elem.classList.remove('expanded');
-					closeInfo(getNextRowAfter(elem));
-				}
-			});
-			info.classList.add('open');
+		if (info.classList.toggle('open')) {
 			info.classList.remove('close');
+
+			$$('.compat-table .table-row.extrainfo.open').forEach(elem => {
+				if (elem !== info) closeInfo(elem);
+			});
 		} else {
 			closeInfo(info);
 		}

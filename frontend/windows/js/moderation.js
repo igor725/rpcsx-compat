@@ -14,6 +14,7 @@ export const onload = wdata => {
 	const moder = $('.win-root.moderation');
 	const keyinp = $('.moder-key > input');
 	const infotext = $('.moder-text');
+	const tmoder = $('.moder-data > .table > .table-body');
 
 	let animlock = false;
 	$('.moderation > .moder-text').on('click', ({target}) => {
@@ -147,6 +148,34 @@ export const onload = wdata => {
 	keyinp.on('keydown', ({code}) => {
 		if (code === 'Enter')
 			testModKey();
+	});
+
+	const closeInfo = info => {
+		if (info === null) return;
+		info.classList.remove('open');
+		info.classList.add('close');
+		setTimeout(() => info.classList.remove('close'), 255);
+	};
+
+	tmoder.on('click', ({target}) => {
+		const trow = target.classList.contains('.table-row') ? trow : target.closest('.table-row');
+
+		if (!trow || trow.classList.contains('.extrainfo')) {
+			return;
+		}
+
+		const info = trow.nextElementSibling;
+		if (info === null) return;
+
+		if (info.classList.toggle('open')) {
+			info.classList.remove('close');
+
+			$$('.moder-table .table-row.extrainfo.open').forEach(elem => {
+				if (elem !== info) closeInfo(elem);
+			});
+		} else {
+			closeInfo(info);
+		}
 	});
 
 	keyinp.value = localStorage.getItem('mod-key');

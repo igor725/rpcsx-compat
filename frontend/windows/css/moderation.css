@@ -20,6 +20,12 @@
 
 .moder-data {
 	display: block;
+	width: 100%;
+	height: 100%;
+}
+
+.moder-row {
+	grid-template-columns: 1fr 15em;
 }
 
 .moderation.moder-mesg > .moder-text {
